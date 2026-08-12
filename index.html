@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NYE 2026→27 Trip Options</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-sidebar:#fbfbfa;
+    --bg-hover:#f1f1ef;
+    --bg-active:#e8e8e6;
+    --bg-callout:#f7f6f3;
+    --border:#e9e9e7;
+    --text:#37352f;
+    --text-muted:#787774;
+    --text-faint:#9b9a97;
+    --blue-bg:#e7f3f8; --blue-text:#0b6e99;
+    --yellow-bg:#fdecc8; --yellow-text:#8a5b0f;
+    --red-bg:#ffe2dd; --red-text:#ad3a21;
+    --green-bg:#ddf3e4; --green-text:#0f7a3d;
+    --purple-bg:#eee3f8; --purple-text:#6b3fa0;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0; display:flex; min-height:100vh; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  a{color:#2383e2; text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  img{max-width:100%;}
+
+  /* sidebar */
+  .sidebar{
+    width:250px; flex-shrink:0; background:var(--bg-sidebar); border-right:1px solid var(--border);
+    height:100vh; position:sticky; top:0; overflow-y:auto; padding:18px 10px;
+  }
+  .side-title{padding:6px 10px 14px; font-size:12.5px; font-weight:600; color:var(--text-faint); text-transform:uppercase; letter-spacing:.04em;}
+  .side-item{
+    display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:5px; cursor:pointer;
+    font-size:14px; color:var(--text); margin-bottom:1px; min-height:40px;
+  }
+  .side-item:hover{background:var(--bg-hover);}
+  .side-item.active{background:var(--bg-active); font-weight:600;}
+  .side-icon{font-size:16px; flex-shrink:0;}
+  .side-price{margin-left:auto; font-family:var(--mono); font-size:10.5px; color:var(--text-faint); flex-shrink:0;}
+  .side-foot{padding:16px 10px 4px; font-size:11.5px; color:var(--text-faint); border-top:1px solid var(--border); margin-top:10px; line-height:1.6;}
+
+  /* main */
+  .main{flex:1; min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-inner{max-width:800px; margin:0 auto; padding:56px 40px 100px;}
+
+  .page-icon{font-size:46px; line-height:1; margin-bottom:10px;}
+  .page-inner h1{font-size:32px; font-weight:700; margin:0 0 4px; letter-spacing:-0.01em;}
+  .page-sub{font-size:15px; color:var(--text-muted); margin-bottom:20px;}
+
+  .props{border:1px solid var(--border); border-radius:6px; margin-bottom:16px; overflow:hidden;}
+  .prow{display:flex; border-bottom:1px solid var(--border); font-size:13.5px;}
+  .prow:last-child{border-bottom:none;}
+  .plabel{width:150px; flex-shrink:0; padding:8px 12px; color:var(--text-muted); background:var(--bg-sidebar); display:flex; align-items:center; gap:6px;}
+  .pvalue{padding:8px 12px; flex:1; display:flex; align-items:center;}
+  .pvalue.strong{font-weight:600;}
+
+  .pills{display:flex; gap:6px; margin:14px 0 28px; flex-wrap:wrap;}
+  .pill{font-size:12px; padding:3px 10px; border-radius:4px; font-weight:600;}
+  .pill.snow{background:var(--blue-bg); color:var(--blue-text);}
+  .pill.nye{background:var(--yellow-bg); color:var(--yellow-text);}
+  .pill.warm{background:var(--red-bg); color:var(--red-text);}
+  .pill.aurora{background:var(--green-bg); color:var(--green-text);}
+  .pill.src{background:var(--purple-bg); color:var(--purple-text);}
+
+  hr.div{border:none; border-top:1px solid var(--border); margin:30px 0;}
+  h2.sec{font-size:19px; font-weight:600; margin:0 0 12px; display:flex; align-items:center; gap:8px;}
+
+  .mapbox{height:400px; border-radius:8px; border:1px solid var(--border); overflow:hidden; margin-bottom:6px; background:#f2f2f0;}
+  .map-cap{font-size:12px; color:var(--text-faint); margin-bottom:30px;}
+  .leaflet-popup-content{font-size:13px; font-family:-apple-system,sans-serif;}
+  .leaflet-popup-content b{font-size:13.5px;}
+
+  details.day{border:1px solid var(--border); border-radius:6px; margin-bottom:6px;}
+  details.day summary{
+    list-style:none; cursor:pointer; padding:10px 12px; display:flex; align-items:center; gap:10px; font-size:14px; min-height:40px;
+  }
+  details.day summary::-webkit-details-marker{display:none;}
+  details.day summary::before{content:'▸'; color:var(--text-faint); font-size:10px; display:inline-block; transition:transform .12s; width:10px; flex-shrink:0;}
+  details.day[open] summary::before{transform:rotate(90deg);}
+  .day-badge{font-family:var(--mono); font-size:11px; color:var(--text-faint); width:16px; flex-shrink:0;}
+  .day-date{font-size:12px; color:var(--text-faint); width:52px; flex-shrink:0;}
+  .day-title{font-weight:500; flex:1; min-width:0;}
+  .day-content{padding:0 12px 12px 48px; font-size:13.5px; color:var(--text-muted); line-height:1.55;}
+  .day-tag{display:inline-block; margin-left:2px; font-size:10.5px; padding:1px 7px; border-radius:3px; font-weight:600;}
+
+  .table-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -2px 14px; padding:0 2px;}
+  table.ntable{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  table.ntable th{text-align:left; padding:7px 10px; background:var(--bg-sidebar); color:var(--text-muted); font-weight:500; font-size:11.5px; text-transform:uppercase; letter-spacing:.02em; border-bottom:1px solid var(--border); white-space:nowrap;}
+  table.ntable td{padding:9px 10px; border-bottom:1px solid var(--border); vertical-align:top;}
+  table.ntable tr:hover td{background:var(--bg-hover);}
+  .hname{font-weight:600;}
+  .hsub{color:var(--text-faint); font-size:12px; margin-top:2px;}
+  .hnote{color:var(--text-muted); font-size:12px; margin-top:4px; font-style:italic; line-height:1.45;}
+  .hnote b{font-style:normal; color:var(--text);}
+  .num{font-family:var(--mono); text-align:right; white-space:nowrap;}
+
+  .flight-card{border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:10px;}
+  .flight-leg{display:flex; align-items:center; gap:10px; padding:7px 0; font-size:13.5px; flex-wrap:wrap;}
+  .flight-leg:not(:last-of-type){border-bottom:1px dashed var(--border);}
+  .flight-route{font-family:var(--mono); font-weight:600; min-width:100px;}
+  .flight-meta{color:var(--text-muted); font-size:12.5px;}
+  .flight-cost-row{
+    display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:10px;
+    border-top:1px solid var(--border); flex-wrap:wrap; gap:6px;
+  }
+  .flight-cost-row .lbl{font-size:12.5px; color:var(--text-muted);}
+  .flight-cost-row .val{font-family:var(--mono); font-weight:700; font-size:15px;}
+
+  .total-callout{
+    background:var(--yellow-bg); border-radius:6px; padding:14px 18px; display:flex; justify-content:space-between;
+    align-items:center; margin:6px 0 8px; flex-wrap:wrap; gap:6px;
+  }
+  .total-callout .label{font-size:13px; color:var(--yellow-text); font-weight:600;}
+  .total-callout .val{font-family:var(--mono); font-size:21px; font-weight:700; color:var(--yellow-text);}
+
+  .callout{background:var(--bg-callout); border-radius:6px; padding:10px 14px; font-size:12.5px; color:var(--text-muted); margin-top:6px; line-height:1.55;}
+  .callout.flag{background:var(--red-bg); color:var(--red-text); font-weight:600; margin:0 0 20px;}
+
+  /* ---------- tablet / small laptop ---------- */
+  @media (max-width:820px){
+    body{flex-direction:column;}
+    .sidebar{width:100%; height:auto; position:static; display:flex; overflow-x:auto; padding:10px; gap:2px;}
+    .side-title, .side-foot{display:none;}
+    .side-item{flex-shrink:0;}
+    .page-inner{padding:32px 18px 70px;}
+    .plabel{width:120px;}
+  }
+
+  /* ---------- phones, incl. Galaxy S25 (~384-412px CSS width) ---------- */
+  @media (max-width:480px){
+    body{font-size:14px;}
+    .sidebar{padding:8px 6px; gap:0;}
+    .side-item{padding:7px 9px; font-size:13px; min-height:38px;}
+    .side-price{font-size:9.5px;}
+    .page-inner{padding:22px 14px 60px;}
+    .page-icon{font-size:38px;}
+    .page-inner h1{font-size:25px;}
+    .page-sub{font-size:13.5px; margin-bottom:16px;}
+    h2.sec{font-size:16.5px; margin-top:2px;}
+    hr.div{margin:22px 0;}
+
+    .prow{flex-direction:column; font-size:13px;}
+    .plabel{width:100%; padding:6px 10px 2px; background:transparent; font-size:11.5px; color:var(--text-faint);}
+    .pvalue{padding:0 10px 8px;}
+
+    .mapbox{height:280px;}
+    .map-cap{margin-bottom:20px; font-size:11px;}
+
+    details.day summary{padding:9px 10px; font-size:13px; gap:7px;}
+    .day-date{width:42px; font-size:11px;}
+    .day-content{padding:0 10px 10px 40px; font-size:12.5px;}
+    .day-tag{font-size:9.5px; padding:1px 5px;}
+
+    table.ntable{font-size:12.5px; min-width:460px;}
+    table.ntable th, table.ntable td{padding:7px 8px;}
+
+    .flight-card{padding:12px 12px;}
+    .flight-leg{font-size:12.5px; gap:6px;}
+    .flight-route{min-width:80px; font-size:12px;}
+    .flight-meta{font-size:11.5px;}
+    .flight-cost-row .val{font-size:14px;}
+
+    .total-callout{padding:12px 14px;}
+    .total-callout .val{font-size:18px;}
+    .callout{font-size:11.5px; padding:9px 12px;}
+    .pill{font-size:11px; padding:3px 8px;}
+  }
+
+  /* ---------- very narrow phones ---------- */
+  @media (max-width:360px){
+    .page-inner{padding:18px 10px 50px;}
+    .page-inner h1{font-size:22px;}
+    table.ntable{min-width:420px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="side-title">NYE 2026 → 27 · From AMS</div>
+  <div id="side-list"></div>
+  <div class="side-foot">8 days · 2 travelers<br>Dec 28 – Jan 4</div>
+</div>
+
+<div class="main" id="main"></div>
+
+<script>
+const tagLabel = {snow:'❄ Snow', nye:'🎆 NYE', warm:'☀ Warm', aurora:'🌌 Aurora'};
+function fmt(n){ return '€' + Math.round(n).toLocaleString('en-US'); }
+
+const DATA = [
+{
+  id:'austria', icon:'🏔️', name:'Austria', subtitle:'Salzburg → Vienna',
+  countries:'Austria', dates:'Dec 28 – Jan 4 · 8 days', tags:['snow','nye'],
+  route:[
+    {code:'AMS', name:'Amsterdam', lat:52.3676, lng:4.9041, mode:null, blurb:'Departure'},
+    {code:'SZG', name:'Salzburg', lat:47.8002, lng:13.0455, mode:'✈ flight', tag:'snow', blurb:'3 nights · Altstadt base'},
+    {code:'VIE', name:'Vienna', lat:48.2087, lng:16.3738, mode:'🚆 train · 2h25', tag:'nye', blurb:'4 nights · NYE here'}
+  ],
+  daytrips:[{code:'HAL', name:'Hallstatt', lat:47.5622, lng:13.6493, from:'SZG', tag:'snow', blurb:'Day trip from Salzburg'}],
+  days:[
+    {d:1,date:'Dec 28',title:'Arrive Salzburg',desc:'Fly AMS → Salzburg. Settle into the Altstadt.',tags:[]},
+    {d:2,date:'Dec 29',title:'Salzburg old town / Zell am See day trip',desc:'Mirabell Gardens, the Dom, Getreidegasse.',tags:['snow']},
+    {d:3,date:'Dec 30',title:'Hallstatt',desc:'1h15 to Austria\'s snowiest lake village.',tags:['snow']},
+    {d:4,date:'Dec 31',title:'Fortress, then Vienna, then NYE',desc:'Hohensalzburg in the morning, train to Vienna, then Silvesterpfad — official fireworks.',tags:['nye']},
+    {d:5,date:'Jan 1',title:'Recover',desc:'Free New Year\'s Concert broadcast at Stephansplatz.',tags:[]},
+    {d:6,date:'Jan 2',title:'Schönbrunn',desc:'Full day at the palace and gardens.',tags:[]},
+    {d:7,date:'Jan 3',title:'Free day',desc:'Belvedere, Naschmarkt, or the Ringstrasse.',tags:[]},
+    {d:8,date:'Jan 4',title:'Fly home',desc:'Vienna → Amsterdam.',tags:[]}
+  ],
+  hotels:[
+    {city:'Salzburg', name:'DAD Vogelweiderhof Rooms', source:'Booking.com', area:'Schallmoos district', checkin:'Dec 28', checkout:'Dec 31', nights:3, total:401, url:'https://www.booking.com/hotel/at/dad-vogelweiderhof-rooms.en-gb.html?aid=2311236&checkin=2026-12-28&checkout=2026-12-31&group_adults=2&no_rooms=1',
+      personalNote:null, extraNote:'Schallmoos district — a working residential area ~20–25 min walk (or one bus, line 21) from the Altstadt, close to the main train station.'},
+    {city:'Vienna', name:'Licht en modern stadsappartement TG10', source:'Airbnb', area:'Vienna', checkin:'Dec 31', checkout:'Jan 4', nights:4, total:418, url:'https://www.airbnb.nl/rooms/1119615189609600227?adults=2&check_in=2026-12-31&check_out=2027-01-04',
+      personalNote:'also really cool', extraNote:null}
+  ],
+  flight:{
+    legs:[
+      {route:'AMS → SZG', carrier:'transavia', date:'Dec 28', dep:'14:20', arr:'15:55'},
+      {route:'VIE → AMS', carrier:'Austrian Airlines', date:'Jan 4', dep:'17:20', arr:'19:15'}
+    ], costPerPerson:229, altNote:null
+  },
+  price:{accom:819},
+  note:'Single country keeps transport simple — one flight in, one train, one flight out.'
+},
+{
+  id:'finland', icon:'❄️', name:'Finland', subtitle:'Helsinki → Turku',
+  countries:'Finland', dates:'Dec 28 – Jan 4 · 8 days', tags:['snow','nye'],
+  route:[
+    {code:'AMS', name:'Amsterdam', lat:52.3676, lng:4.9041, mode:null, blurb:'Departure'},
+    {code:'HEL', name:'Helsinki', lat:60.1699, lng:24.9384, mode:'✈ flight · 2h40', tag:'nye', blurb:'5 nights · NYE here'},
+    {code:'TUR', name:'Turku', lat:60.4518, lng:22.2666, mode:'🚆 train · 2h', tag:'snow', blurb:'2 nights'}
+  ],
+  daytrips:[{code:'POR', name:'Porvoo', lat:60.3934, lng:25.6650, from:'HEL', tag:'snow', blurb:'Day trip from Helsinki'}],
+  days:[
+    {d:1,date:'Dec 28',title:'Fly to Helsinki',desc:'Direct flight, ~2h40.',tags:[]},
+    {d:2,date:'Dec 29',title:'Suomenlinna',desc:'Sea fortress by ferry, then the Design District.',tags:['snow']},
+    {d:3,date:'Dec 30',title:'Porvoo',desc:'1h by bus — a snowy, colour-washed old town.',tags:['snow']},
+    {d:4,date:'Dec 31',title:'Kansalaistori',desc:'Free, official fireworks since the 1930s — private ones banned in the zone.',tags:['nye']},
+    {d:5,date:'Jan 1',title:'Recover',desc:'Sauna at Allas Sea Pool or Löyly.',tags:[]},
+    {d:6,date:'Jan 2',title:'Train to Turku',desc:'~2h — castle, cathedral, old town.',tags:['snow']},
+    {d:7,date:'Jan 3',title:'Turku free day',desc:'Archipelago views.',tags:[]},
+    {d:8,date:'Jan 4',title:'Fly home',desc:'Via Helsinki → Amsterdam.',tags:[]}
+  ],
+  hotels:[
+    {city:'Helsinki', name:'Entire rental apartment (small studio)', source:'Airbnb', area:'Helsinki', checkin:'Dec 28', checkout:'Jan 2', nights:5, total:360, url:'https://www.airbnb.it/rooms/839234582327511520?adults=2&check_in=2026-12-28&check_out=2027-01-02',
+      personalNote:'great location, small entire studio', extraNote:null},
+    {city:'Turku', name:'Cottage Koivurinne', source:'Airbnb', area:'Just outside Turku', checkin:'Jan 2', checkout:'Jan 4', nights:2, total:359, url:'https://www.airbnb.it/rooms/1323417769009098843?adults=2&check_in=2027-01-02&check_out=2027-01-05',
+      personalNote:'cabin in the woods. extend stay to 5 of Jan (with car only)', extraNote:'A genuine cabin-in-the-woods stay rather than a city-centre base — lovely for the aesthetic, but factor in a taxi or rental car from Turku, since it\'s not an easy walk in the snow with luggage.'}
+  ],
+  flight:{
+    legs:[
+      {route:'AMS → HEL', carrier:'KLM', date:'Dec 28', dep:'09:45', arr:'13:10'},
+      {route:'HEL → AMS', carrier:'KLM', date:'Jan 4', dep:'14:05', arr:'15:40'}
+    ], costPerPerson:313, altNote:'Also quoted with a Jan 5 return at the same €313 — not used here since the Turku cottage checks out Jan 4.'
+  },
+  price:{accom:719},
+  note:'Nordic cost of living pushes food and flights up, but snow and safety are the most reliable here.'
+},
+{
+  id:'tenerife', icon:'🌴', name:'Tenerife', subtitle:'Santa Cruz + Teide',
+  countries:'Spain (Canary Islands)', dates:'Dec 28 – Jan 4 · 8 days', tags:['warm','nye'],
+  route:[
+    {code:'AMS', name:'Amsterdam', lat:52.3676, lng:4.9041, mode:null, blurb:'Departure'},
+    {code:'TFS', name:'Santa Cruz', lat:28.4636, lng:-16.2518, mode:'✈ flight · 4h45', tag:'nye', blurb:'7 nights · NYE here'}
+  ],
+  daytrips:[
+    {code:'LLG', name:'La Laguna', lat:28.4874, lng:-16.3159, from:'TFS', blurb:'UNESCO old town'},
+    {code:'TEI', name:'Teide N.P.', lat:28.2716, lng:-16.6423, from:'TFS', tag:'snow', blurb:'Snow near the 3,555m summit'},
+    {code:'PDC', name:'Puerto de la Cruz', lat:28.4160, lng:-16.5457, from:'TFS', blurb:'North coast'}
+  ],
+  days:[
+    {d:1,date:'Dec 28',title:'Fly to Tenerife South',desc:'Direct flight, ~4h45.',tags:[]},
+    {d:2,date:'Dec 29',title:'Santa Cruz',desc:'Plaza de España, Auditorio de Tenerife.',tags:[]},
+    {d:3,date:'Dec 30',title:'La Laguna',desc:'UNESCO old town, 20 min by tram.',tags:[]},
+    {d:4,date:'Dec 31',title:'Teide, then fireworks',desc:'Cable car into the national park — snow near the summit. Evening: free official fireworks at Plaza de España.',tags:['snow','nye']},
+    {d:5,date:'Jan 1',title:'Beach day',desc:'Playa de Las Teresitas.',tags:[]},
+    {d:6,date:'Jan 2',title:'Puerto de la Cruz',desc:'1h by bus — botanical garden, black-sand coast.',tags:[]},
+    {d:7,date:'Jan 3',title:'Anaga Rural Park',desc:'Laurel-forest hiking.',tags:[]},
+    {d:8,date:'Jan 4',title:'Fly home',desc:'Tenerife South → Amsterdam.',tags:[]}
+  ],
+  hotels:[
+    {city:'Santa Cruz area', name:'Latasca2', source:'Booking.com', area:'Las Lagunas (inland, rural)', checkin:'Dec 28', checkout:'Jan 4', nights:7, total:428, url:'https://www.booking.com/hotel/es/latasca2.en-gb.html?aid=2336990&checkin=2026-12-28&checkout=2027-01-04&group_adults=2&no_rooms=1',
+      personalNote:'Not great location, but in the nature, very nice and calm - how to get there?', extraNote:'Las Lagunas is a quiet agricultural zone inland from Santa Cruz — genuinely calm, but public transport is thin. Booking.com reviews mention it sits on a road with some traffic noise; a rental car makes this pick far more workable than relying on buses.'}
+  ],
+  flight:{
+    legs:[
+      {route:'AMS → TFS', carrier:'easyJet', date:'Dec 28', dep:'07:35', arr:'11:25'},
+      {route:'TFS → AMS', carrier:'easyJet', date:'Jan 4', dep:'12:05', arr:'17:45'}
+    ], costPerPerson:253, altNote:null
+  },
+  price:{accom:428},
+  note:'The only warm option here — mild coast plus a snow bonus up at Teide.',
+  ownerNote:'Consider booking a car and go on other side of the island. Probably you can find better accommodation.'
+},
+{
+  id:'hun_aut', icon:'🏛️', name:'Hungary + Austria', subtitle:'Budapest → Vienna',
+  countries:'Hungary, Austria', dates:'Dec 28 – Jan 4 · 8 days', tags:['snow','nye'],
+  route:[
+    {code:'AMS', name:'Amsterdam', lat:52.3676, lng:4.9041, mode:null, blurb:'Departure'},
+    {code:'BUD', name:'Budapest', lat:47.4979, lng:19.0402, mode:'✈ flight · 2h20', tag:'snow', blurb:'3 nights'},
+    {code:'VIE', name:'Vienna', lat:48.2087, lng:16.3738, mode:'🚆 train · 2h30', tag:'nye', blurb:'4 nights · NYE here'}
+  ],
+  daytrips:[],
+  days:[
+    {d:1,date:'Dec 28',title:'Fly to Budapest',desc:'Direct flight, ~2h20.',tags:[]},
+    {d:2,date:'Dec 29',title:'Buda Castle',desc:'Fisherman\'s Bastion, Danube views.',tags:['snow']},
+    {d:3,date:'Dec 30',title:'Széchenyi Baths',desc:'Outdoor thermal baths, then Parliament.',tags:['snow']},
+    {d:4,date:'Dec 31',title:'Train to Vienna → NYE',desc:'2h30 train. Evening: Silvesterpfad, official fireworks. (Budapest itself has no official show — private fireworks only.)',tags:['nye']},
+    {d:5,date:'Jan 1',title:'Recover',desc:'New Year\'s Concert broadcast at Stephansplatz.',tags:[]},
+    {d:6,date:'Jan 2',title:'Schönbrunn',desc:'Full day at the palace.',tags:[]},
+    {d:7,date:'Jan 3',title:'Free day',desc:'Old Town or the Naschmarkt.',tags:[]},
+    {d:8,date:'Jan 4',title:'Fly home',desc:'Vienna → Amsterdam.',tags:[]}
+  ],
+  hotels:[
+    {city:'Budapest', name:'Galaxy Apartement Lift Parking', source:'Booking.com', area:'District XIII (Angyalföld–Újlipótváros)', checkin:'Dec 28', checkout:'Dec 31', nights:3, total:232, url:'https://www.booking.com/hotel/hu/galaxy-apartement-lift-parking.en-gb.html?aid=8132308&checkin=2026-12-28&checkout=2026-12-31&group_adults=2&no_rooms=1',
+      personalNote:'Seems perfect', extraNote:'District XIII, right by Nyugati train station — 5 min walk to WestEnd City Center, ~10 min to Széchenyi Baths, well connected by metro and tram.'},
+    {city:'Vienna', name:'Licht en modern stadsappartement TG10', source:'Airbnb', area:'Vienna', checkin:'Dec 31', checkout:'Jan 4', nights:4, total:418, url:'https://www.airbnb.nl/rooms/1119615189609600227?adults=2&check_in=2026-12-31&check_out=2027-01-04',
+      personalNote:'also really cool', extraNote:null}
+  ],
+  flight:{
+    legs:[
+      {route:'AMS → BUD', carrier:'KLM', date:'Dec 28', dep:'09:30', arr:'11:30'},
+      {route:'VIE → AMS', carrier:'KLM', date:'Jan 4', dep:'17:05', arr:'18:55'}
+    ], costPerPerson:241, altNote:null
+  },
+  price:{accom:650},
+  note:'Budapest for culture and baths, Vienna for the safe official fireworks — Budapest itself has no official show.'
+},
+{
+  id:'aut_svn', icon:'⛷️', name:'Austria + Slovenia', subtitle:'Vienna → Ljubljana → Bled',
+  countries:'Austria, Slovenia', dates:'Dec 28 – Jan 4 · 8 days', tags:['snow','nye'],
+  route:[
+    {code:'AMS', name:'Amsterdam', lat:52.3676, lng:4.9041, mode:null, blurb:'Departure'},
+    {code:'VIE', name:'Vienna', lat:48.2087, lng:16.3738, mode:'✈ flight', blurb:'3 nights'},
+    {code:'LJU', name:'Ljubljana', lat:46.0569, lng:14.5058, mode:'🚌 bus · 5h', tag:'nye', blurb:'4 nights · NYE here'}
+  ],
+  daytrips:[{code:'BLD', name:'Lake Bled', lat:46.3683, lng:14.1146, from:'LJU', tag:'snow', blurb:'Day trip from Ljubljana'}],
+  days:[
+    {d:1,date:'Dec 28',title:'Fly to Vienna',desc:'Direct flight, ~1h35.',tags:[]},
+    {d:2,date:'Dec 29',title:'Schönbrunn',desc:'Full day at the palace.',tags:[]},
+    {d:3,date:'Dec 30',title:'Vienna old town',desc:'Stephansdom, Belvedere, Naschmarkt.',tags:[]},
+    {d:4,date:'Dec 31',title:'Bus to Ljubljana → NYE',desc:'~5h FlixBus. Evening: official, biodegradable midnight fireworks from Ljubljana Castle.',tags:['nye']},
+    {d:5,date:'Jan 1',title:'Recover',desc:'Ljubljana Castle by funicular, Triple Bridge.',tags:[]},
+    {d:6,date:'Jan 2',title:'Lake Bled',desc:'~1h by cheap, frequent Arriva bus.',tags:['snow']},
+    {d:7,date:'Jan 3',title:'Free day',desc:'Optional car rental for Bohinj / Kranjska Gora.',tags:[]},
+    {d:8,date:'Jan 4',title:'Fly home',desc:'Ljubljana → Amsterdam.',tags:[]}
+  ],
+  hotels:[
+    {city:'Vienna', name:'CityPrime Apartments Vienna', source:'Booking.com', area:'Vienna', checkin:'Dec 28', checkout:'Dec 31', nights:3, total:297, url:'https://www.booking.com/hotel/at/cityhit1020-treasure-home-top12.it.html?aid=2311236&checkin=2026-12-28&checkout=2026-12-31&group_adults=2&no_rooms=1',
+      personalNote:'great location, entire apartament', extraNote:null},
+    {city:'Ljubljana', name:'Accogliente appartamento arredato per due', source:'Airbnb', area:'Ljubljana', checkin:'Dec 31', checkout:'Jan 4', nights:4, total:417, url:'https://www.airbnb.it/rooms/5666742?adults=2&check_in=2026-12-31&check_out=2027-01-04',
+      personalNote:'entire apartment in nice location', extraNote:null}
+  ],
+  flight:{
+    legs:[
+      {route:'AMS → VIE', carrier:'KLM', date:'Dec 28', dep:'09:35', arr:'11:20'},
+      {route:'LJU → AMS', carrier:'KLM', date:'Jan 4', dep:'12:50', arr:'14:45'}
+    ], costPerPerson:371, altNote:null
+  },
+  price:{accom:714},
+  note:'Full days in both cities, no rushed stops. Bus beats a car here on cost.'
+},
+{
+  id:'tromso', icon:'🌌', name:'Tromsø (Northern Lights)', subtitle:'Tromsø only — single location',
+  countries:'Norway', tags:['snow','aurora'], isWindowPair:true,
+  route:[
+    {code:'AMS', name:'Amsterdam', lat:52.3676, lng:4.9041, mode:null, blurb:'Departure'},
+    {code:'TOS', name:'Tromsø', lat:69.6492, lng:18.9560, mode:'✈ direct', tag:'aurora', blurb:'7 nights · single base, no other stops'}
+  ],
+  daytrips:[],
+  days:[
+    {d:1,title:'Fly to Tromsø',desc:'Direct transavia flight, ~3h15. Settle in.',tags:[]},
+    {d:2,title:'Arctic Cathedral & waterfront',desc:'Polar Museum by day. After dark: free self-guided aurora watch from Telegrafbukta beach or across Tromsø Bridge.',tags:['aurora']},
+    {d:3,title:'Fjellheisen cable car',desc:'Panoramic city and fjord views by day (optional paid ticket). Another free aurora attempt after dark.',tags:['aurora']},
+    {d:4,title:'Flex day',desc:'A spare evening to chase clearer skies elsewhere in town if the forecast changes.',tags:['aurora']},
+    {d:5,title:'Recover',desc:'Easy walk around Prestvannet lake.',tags:[]},
+    {d:6,title:'Flex day',desc:'Another self-guided aurora attempt, or book the optional minibus chase tour for better odds via real-time cloud tracking.',tags:['aurora']},
+    {d:7,title:'Flex day',desc:'Polaria Arctic experience centre, local seafood, final aurora attempt.',tags:['aurora']},
+    {d:8,title:'Fly home',desc:'Tromsø → Amsterdam.',tags:[]}
+  ],
+  windows:[
+    {
+      label:'Window A', dateRange:'Dec 29 → Jan 5', dayDates:['Dec 29','Dec 30','Dec 31','Jan 1','Jan 2','Jan 3','Jan 4','Jan 5'],
+      flight:{legs:[
+        {route:'AMS → TOS', carrier:'transavia', date:'Dec 29', dep:'06:25', arr:'09:40'},
+        {route:'TOS → AMS', carrier:'transavia', date:'Jan 5', dep:'10:30', arr:'13:55'}
+      ], costPerPerson:176},
+      hotels:[
+        {name:'Accogliente rifugio con sauna, 10 min dal centro', source:'Airbnb', area:'~10 min from centre', checkin:'Dec 29', checkout:'Jan 5', nights:7, total:1252, url:'https://www.airbnb.it/rooms/1296902641334808530?adults=2&check_in=2026-12-28&check_out=2027-01-04',
+          personalNote:'nice apartment with sauna for dates 28 dec to 4 jan', extraNote:'Has a private sauna — genuinely useful for warming up after standing outside watching for aurora in Arctic-winter cold.', selected:true}
+      ]
+    },
+    {
+      label:'Window B', dateRange:'Dec 31 → Jan 7', dayDates:['Dec 31','Jan 1','Jan 2','Jan 3','Jan 4','Jan 5','Jan 6','Jan 7'],
+      flight:{legs:[
+        {route:'AMS → TOS', carrier:'transavia', date:'Dec 31', dep:'05:40', arr:'08:55'},
+        {route:'TOS → AMS', carrier:'transavia', date:'Jan 7', dep:'09:45', arr:'13:10'}
+      ], costPerPerson:205},
+      hotels:[
+        {name:'3rd floor apartment with view', source:'Booking.com', area:'Tromsø', checkin:'Jan 2', checkout:'Jan 8', nights:7, total:1440, url:'https://www.booking.com/hotel/no/3rd-floor-apartment-with-view-tromso.en-gb.html?aid=2311236&checkin=2027-01-02&checkout=2027-01-08&group_adults=2&no_rooms=1',
+          personalNote:'apartment, non-refundable. Dates btw 2 and 8 of Jan', extraNote:null, selected:true},
+        {name:'Salotto accogliente, alcova per dormire e bagno', source:'Airbnb', area:'Tromsø', checkin:'Jan 2', checkout:'Jan 8', nights:7, total:848, url:'https://www.airbnb.it/rooms/980248480589586990?adults=2&check_in=2027-01-02&check_out=2027-01-08',
+          personalNote:'super cozy with nice terrace outside. From 2 jan to 8 jan', extraNote:'The cheaper of the two Window B picks — worth a look if the non-refundable terms on the other option are a concern.', selected:false}
+      ]
+    }
+  ],
+  note:'Both windows researched from scratch — real search shows accommodation running well above quieter dates nearby either way. Arctic aurora tourism and New Year demand both push Tromsø rates up hard this close to Dec 31–Jan 1, whichever exact days are chosen.'
+},
+{
+  id:'reykjavik', icon:'🌋', name:'Reykjavík (Northern Lights)', subtitle:'Reykjavík only — single location',
+  countries:'Iceland', tags:['snow','aurora'], isWindowPair:true,
+  route:[
+    {code:'AMS', name:'Amsterdam', lat:52.3676, lng:4.9041, mode:null, blurb:'Departure'},
+    {code:'KEF', name:'Reykjavík', lat:64.1466, lng:-21.9426, mode:'✈ direct', tag:'aurora', blurb:'7 nights · single base, no other stops'}
+  ],
+  daytrips:[],
+  days:[
+    {d:1,title:'Fly to Reykjavík',desc:'Direct transavia flight, ~2h25.',tags:[]},
+    {d:2,title:'Reykjavík city',desc:'Hallgrímskirkja church, Sun Voyager sculpture, Old Harbour.',tags:[]},
+    {d:3,title:'Free aurora watch',desc:'Grótta Lighthouse — a popular, free, dark-sky spot a short walk/bus from downtown.',tags:['aurora']},
+    {d:4,title:'Golden Circle',desc:'Þingvellir National Park, Geysir, Gullfoss (optional day tour). If this day lands on Dec 31, Reykjavík\'s widespread, dramatic fireworks are free to watch from almost anywhere.',tags:['aurora']},
+    {d:5,title:'Local thermal pools',desc:'Sundhöllin or Laugardalslaug — cheap (~€10pp), authentic, and a good warm-up before another aurora attempt.',tags:['aurora']},
+    {d:6,title:'Flex day',desc:'Another self-guided aurora attempt, or the optional Blue Lagoon.',tags:['aurora']},
+    {d:7,title:'Reykjavík free day',desc:'Perlan, Old Harbour, local cafés.',tags:[]},
+    {d:8,title:'Fly home',desc:'Reykjavík → Amsterdam.',tags:[]}
+  ],
+  windows:[
+    {
+      label:'Window A', dateRange:'Dec 28 → Jan 4', dayDates:['Dec 28','Dec 29','Dec 30','Dec 31','Jan 1','Jan 2','Jan 3','Jan 4'],
+      flight:{legs:[
+        {route:'AMS → KEF', carrier:'transavia', date:'Dec 28', dep:'11:20', arr:'13:45'},
+        {route:'KEF → AMS', carrier:'transavia', date:'Jan 4', dep:'14:45', arr:'18:55'}
+      ], costPerPerson:306},
+      hotels:[
+        {name:'Beautiful small apartment in the center of Reykjavík', source:'Booking.com', area:'Central Reykjavík', checkin:'Dec 28', checkout:'Jan 4', nights:7, total:1098, url:'https://www.booking.com/hotel/is/beautiful-small-apartment-in-the-center-of-reykjavik.en-gb.html?aid=397594&checkin=2026-12-28&checkout=2027-01-04&group_adults=2&no_rooms=1',
+          personalNote:'period between 28 dec and 4 jan', extraNote:'Genuinely central — walking distance to Hallgrímskirkja and the harbour, which matters in Reykjavík since taxis add up fast.', selected:true},
+        {name:'Grazioso appartamento con vista su Reykjavík', source:'Airbnb', area:'Reykjavík', checkin:'Dec 28', checkout:'Jan 4', nights:7, total:1174, url:'https://www.airbnb.it/rooms/1370976693526714589?adults=2&check_in=2026-12-28&check_out=2027-01-04',
+          personalNote:'nice apartment, with balkony amazing view. Period 28 dec to 4 jan', extraNote:null, selected:false}
+      ]
+    },
+    {
+      label:'Window B', dateRange:'Jan 2 → Jan 9', dayDates:['Jan 2','Jan 3','Jan 4','Jan 5','Jan 6','Jan 7','Jan 8','Jan 9'],
+      flight:{legs:[
+        {route:'AMS → KEF', carrier:'transavia', date:'Jan 2', dep:'11:20', arr:'13:45'},
+        {route:'KEF → AMS', carrier:'transavia', date:'Jan 8', dep:'14:45', arr:'18:55'}
+      ], costPerPerson:202},
+      hotels:[
+        {name:'Grazioso appartamento con vista su Reykjavík', source:'Airbnb', area:'Reykjavík', checkin:'Jan 2', checkout:'Jan 8', nights:7, total:1120, url:'https://www.airbnb.it/rooms/1370976693526714589?adults=2&check_in=2027-01-02&check_out=2027-01-08',
+          personalNote:'amazing apartment with nice balcony', extraNote:null, selected:true}
+      ]
+    }
+  ],
+  note:'A genuine trade-off either way: Iceland\'s Atlantic coastal weather is cloudier and less predictable than Arctic Norway, so aurora tour success rates run roughly 50–65% here vs about 90% in Tromsø. Food is notably expensive in Iceland — budget accordingly. Golden Circle and Blue Lagoon are optional paid extras, not required for the aurora itself.'
+},
+{
+  id:'vie_tos', icon:'🎢', name:'Vienna + Tromsø (Combo)', subtitle:'Vienna (NYE) → Tromsø (Northern Lights)',
+  countries:'Austria, Norway', dates:'Dec 29 – Jan 5 · 8 days', tags:['snow','nye','aurora'],
+  flag:'Dates and flights on this one still need to be double-checked before booking — the VIE→TOS leg only runs ~2x/week.',
+  route:[
+    {code:'AMS', name:'Amsterdam', lat:52.3676, lng:4.9041, mode:null, blurb:'Departure'},
+    {code:'VIE', name:'Vienna', lat:48.2087, lng:16.3738, mode:'✈ flight', tag:'nye', blurb:'4 nights · NYE here'},
+    {code:'TOS', name:'Tromsø', lat:69.6492, lng:18.9560, mode:'✈ flight, direct · ~3h25', tag:'aurora', blurb:'3 nights · Northern Lights'}
+  ],
+  daytrips:[],
+  days:[
+    {d:1,date:'Dec 29',title:'Fly to Vienna',desc:'Direct flight AMS → Vienna. Settle in.',tags:[]},
+    {d:2,date:'Dec 30',title:'Vienna old town',desc:'Schönbrunn, Stephansdom, Belvedere.',tags:[]},
+    {d:3,date:'Dec 31',title:'NYE in Vienna',desc:'Silvesterpfad — official midnight fireworks at Rathausplatz.',tags:['nye']},
+    {d:4,date:'Jan 1',title:'Recover',desc:'Free New Year\'s Concert broadcast at Stephansplatz.',tags:[]},
+    {d:5,date:'Jan 2',title:'Fly to Tromsø',desc:'Direct Austrian Airlines flight VIE → TOS, ~3h25.',tags:[]},
+    {d:6,date:'Jan 3',title:'Arctic Cathedral & waterfront',desc:'Free self-guided aurora watch after dark.',tags:['aurora']},
+    {d:7,date:'Jan 4',title:'Fjellheisen cable car',desc:'Panoramic views by day, another aurora attempt after dark.',tags:['aurora']},
+    {d:8,date:'Jan 5',title:'Fly home',desc:'Tromsø → Amsterdam.',tags:[]}
+  ],
+  hotels:[
+    {city:'Vienna', name:'Beautiful apartment in the 3rd district Welcome', source:'Airbnb', area:'Vienna, 3rd district', checkin:'Dec 29', checkout:'Jan 2', nights:4, total:329, url:'https://www.airbnb.co.uk/rooms/1749137044737780360?adults=2&check_in=2026-12-29&check_out=2027-01-02',
+      personalNote:'nice place, closer to center', extraNote:null},
+    {city:'Tromsø', name:'House (apartment) by the river', source:'Airbnb', area:'Tromsø', checkin:'Jan 2', checkout:'Jan 5', nights:3, total:540, url:'https://www.airbnb.co.uk/rooms/973990716422508778?adults=2&check_in=2027-01-02&check_out=2027-01-05',
+      personalNote:'entire house, view seems amazing. has ski and snowshoes included', extraNote:null}
+  ],
+  flight:{legs:[], costPerPerson:596, altNote:null},
+  price:{accom:869},
+  note:'Two very different stops in one trip — Vienna\'s official NYE fireworks, then Tromsø for the Northern Lights. Flight price is a flat average estimate, not itemized per leg.'
+}
+];
+
+function windowTotals(w){
+  const selHotel = w.hotels.find(h=>h.selected) || w.hotels[0];
+  const flightsTotal = w.flight.costPerPerson * 2;
+  const total = flightsTotal + selHotel.total;
+  return {flightsTotal, accom:selHotel.total, total, pp:Math.round(total/2), selHotel};
+}
+
+function renderSidebar(){
+  document.getElementById('side-list').innerHTML = DATA.map((it,i)=>{
+    let priceLabel;
+    if(it.isWindowPair){
+      const t = it.windows.map(windowTotals);
+      const lo = Math.min(...t.map(x=>x.pp)), hi = Math.max(...t.map(x=>x.pp));
+      priceLabel = lo===hi ? fmt(lo) : `${fmt(lo)}–${fmt(hi)}`;
+    } else {
+      priceLabel = fmt(Math.round((it.flight.costPerPerson*2 + it.price.accom)/2));
+    }
+    return `<div class="side-item${i===0?' active':''}" data-id="${it.id}" onclick="selectPage('${it.id}')">
+      <span class="side-icon">${it.icon}</span> ${it.name}
+      <span class="side-price">${priceLabel}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderPage(it){
+  const flightsTotal = it.flight.costPerPerson * 2;
+  const total = flightsTotal + it.price.accom;
+  const pp = Math.round(total/2);
+  const nights = it.hotels.reduce((s,h)=>s+h.nights,0);
+
+  return `<div class="page-inner">
+    <div class="page-icon">${it.icon}</div>
+    <h1>${it.name}</h1>
+    <div class="page-sub">${it.subtitle}</div>
+
+    <div class="props">
+      <div class="prow"><div class="plabel">📍 Countries</div><div class="pvalue">${it.countries}</div></div>
+      <div class="prow"><div class="plabel">📅 Dates</div><div class="pvalue">${it.dates}</div></div>
+      <div class="prow"><div class="plabel">✈️ Departure</div><div class="pvalue">Amsterdam (AMS)</div></div>
+      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong">${fmt(pp)}</div></div>
+    </div>
+    <div class="pills">${it.tags.map(t=>`<span class="pill ${t}">${tagLabel[t]}</span>`).join('')}</div>
+    ${it.flag ? `<div class="callout flag">⚠️ ${it.flag}</div>` : ''}
+
+    <hr class="div">
+    <h2 class="sec">🗺️ The route</h2>
+    <div class="mapbox" id="map-${it.id}"></div>
+    <div class="map-cap">Drag to pan, scroll to zoom, click a stop for details.</div>
+
+    <h2 class="sec">📅 Day by day</h2>
+    ${it.days.map(d=>`
+      <details class="day" open>
+        <summary>
+          <span class="day-badge">${String(d.d).padStart(2,'0')}</span>
+          <span class="day-date">${d.date}</span>
+          <span class="day-title">${d.title}${d.tags.map(t=>`<span class="day-tag pill ${t}">${tagLabel[t]}</span>`).join('')}</span>
+        </summary>
+        <div class="day-content">${d.desc}</div>
+      </details>
+    `).join('')}
+
+    <hr class="div">
+    <h2 class="sec">🏨 Where you'll stay</h2>
+    <div class="table-wrap">
+    <table class="ntable">
+      <thead><tr><th>City</th><th>Hotel</th><th>Dates</th><th>Nights</th><th style="text-align:right">Total</th><th></th></tr></thead>
+      <tbody>
+        ${it.hotels.map(h=>{
+          const noteBits = [];
+          if(h.personalNote) noteBits.push(`<b>Your note:</b> "${h.personalNote}"`);
+          if(h.extraNote) noteBits.push(h.extraNote);
+          const noteHtml = noteBits.length ? `<div class="hnote">${noteBits.join(' — ')}</div>` : '';
+          return `<tr>
+          <td>${h.city}</td>
+          <td>
+            <div class="hname">${h.name}</div>
+            <div class="hsub"><span class="pill src" style="padding:1px 7px;font-size:10.5px;">${h.source}</span> · ${h.area}</div>
+            ${noteHtml}
+          </td>
+          <td>${h.checkin} → ${h.checkout}</td>
+          <td>${h.nights}</td>
+          <td class="num">${fmt(h.total)}</td>
+          <td><a href="${h.url}" target="_blank" rel="noopener">View →</a></td>
+        </tr>`;}).join('')}
+      </tbody>
+    </table>
+    </div>
+    <div class="callout">✓ Private double room · ✓ Private bathroom · ✓ Central / safe area · Real picks from your own Booking.com + Airbnb research, exact dates above.</div>
+    ${it.ownerNote ? `<div class="callout"><b>Your note:</b> ${it.ownerNote}</div>` : ''}
+
+    <hr class="div">
+    <h2 class="sec">✈️ Flights</h2>
+    ${it.flight.legs && it.flight.legs.length ? `
+    <div class="flight-card">
+      ${it.flight.legs.map(l=>`
+        <div class="flight-leg">
+          <span class="flight-route">${l.route}</span>
+          <span class="flight-meta">${l.carrier} · ${l.date} · ${l.dep}–${l.arr}</span>
+        </div>
+      `).join('')}
+      <div class="flight-cost-row">
+        <span class="lbl">Round-trip, per person</span>
+        <span class="val">${fmt(it.flight.costPerPerson)}</span>
+      </div>
+    </div>` : `
+    <div class="flight-card">
+      <div class="flight-cost-row" style="margin-top:0;padding-top:0;border-top:none;">
+        <span class="lbl">Estimated average, per person</span>
+        <span class="val">${fmt(it.flight.costPerPerson)}</span>
+      </div>
+    </div>`}
+    ${it.flight.altNote ? `<div class="callout">${it.flight.altNote}</div>` : ''}
+
+    <hr class="div">
+    <h2 class="sec">💰 The numbers — flights + hotels only</h2>
+    <div class="table-wrap">
+    <table class="ntable">
+      <tbody>
+        <tr><td>Flights (2 travelers)</td><td class="num" colspan="4">${fmt(flightsTotal)}</td></tr>
+        <tr><td>Accommodation (${nights} nights, real rate)</td><td class="num" colspan="4">${fmt(it.price.accom)}</td></tr>
+        <tr style="font-weight:600"><td>Total, 2 travelers</td><td class="num" colspan="4">${fmt(total)}</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="total-callout">
+      <span class="label">Per person</span>
+      <span class="val">${fmt(pp)}</span>
+    </div>
+    <div class="callout">${it.note}</div>
+  </div>`;
+}
+
+function renderHotelTable(hotels){
+  return `<div class="table-wrap">
+    <table class="ntable">
+      <thead><tr><th></th><th>Property</th><th>Dates</th><th>Nights</th><th style="text-align:right">Total</th><th></th></tr></thead>
+      <tbody>
+        ${hotels.map(h=>{
+          const noteBits = [];
+          if(h.personalNote) noteBits.push(`<b>Your note:</b> "${h.personalNote}"`);
+          if(h.extraNote) noteBits.push(h.extraNote);
+          const noteHtml = noteBits.length ? `<div class="hnote">${noteBits.join(' — ')}</div>` : '';
+          return `<tr>
+          <td>${h.selected ? '<span class="pill nye" style="padding:1px 7px;font-size:10px;">selected</span>' : ''}</td>
+          <td>
+            <div class="hname">${h.name}</div>
+            <div class="hsub"><span class="pill src" style="padding:1px 7px;font-size:10.5px;">${h.source}</span> · ${h.area}</div>
+            ${noteHtml}
+          </td>
+          <td>${h.checkin} → ${h.checkout}</td>
+          <td>${h.nights}</td>
+          <td class="num">${fmt(h.total)}</td>
+          <td><a href="${h.url}" target="_blank" rel="noopener">View →</a></td>
+        </tr>`;}).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function renderFlightCard(flight){
+  return `<div class="flight-card">
+    ${flight.legs.map(l=>`
+      <div class="flight-leg">
+        <span class="flight-route">${l.route}</span>
+        <span class="flight-meta">${l.carrier} · ${l.date} · ${l.dep}–${l.arr}</span>
+      </div>
+    `).join('')}
+    <div class="flight-cost-row">
+      <span class="lbl">Round-trip, per person</span>
+      <span class="val">${fmt(flight.costPerPerson)}</span>
+    </div>
+  </div>`;
+}
+
+function renderWindowPage(it){
+  const totals = it.windows.map(windowTotals);
+
+  return `<div class="page-inner">
+    <div class="page-icon">${it.icon}</div>
+    <h1>${it.name}</h1>
+    <div class="page-sub">${it.subtitle}</div>
+
+    <div class="props">
+      <div class="prow"><div class="plabel">📍 Countries</div><div class="pvalue">${it.countries}</div></div>
+      <div class="prow"><div class="plabel">📅 Dates</div><div class="pvalue">${it.windows.map(w=>`${w.label}: ${w.dateRange}`).join('  ·  ')} (8 days each)</div></div>
+      <div class="prow"><div class="plabel">✈️ Departure</div><div class="pvalue">Amsterdam (AMS)</div></div>
+      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong">${totals.map((t,i)=>`${it.windows[i].label}: ${fmt(t.pp)}`).join('  ·  ')}</div></div>
+    </div>
+    <div class="pills">${it.tags.map(t=>`<span class="pill ${t}">${tagLabel[t]}</span>`).join('')}
+      <span class="pill" style="background:#eef0f2;color:#57606a;">🪟 Two windows researched — both shown below</span>
+    </div>
+
+    <hr class="div">
+    <h2 class="sec">🗺️ The route</h2>
+    <div class="mapbox" id="map-${it.id}"></div>
+    <div class="map-cap">Same destination either window — drag to pan, scroll to zoom.</div>
+
+    <h2 class="sec">📅 Day by day</h2>
+    <div class="callout" style="margin-bottom:12px;">Same plan either window, just shifted in the calendar — see each window's exact dates below.</div>
+    ${it.days.map(d=>`
+      <details class="day" open>
+        <summary>
+          <span class="day-badge">${String(d.d).padStart(2,'0')}</span>
+          <span class="day-date">${it.windows.map((w,i)=>w.dayDates[d.d-1]).join(' / ')}</span>
+          <span class="day-title">${d.title}${d.tags.map(t=>`<span class="day-tag pill ${t}">${tagLabel[t]}</span>`).join('')}</span>
+        </summary>
+        <div class="day-content">${d.desc}</div>
+      </details>
+    `).join('')}
+
+    <hr class="div">
+    <h2 class="sec">🪟 Two windows, both real</h2>
+    ${it.windows.map((w,i)=>{
+      const t = totals[i];
+      return `
+      <h3 style="font-size:15px; margin:20px 0 10px; display:flex; align-items:center; gap:8px;">
+        <span class="pill" style="background:#0f5c4a;color:#fff;">${w.label}</span> ${w.dateRange} <span style="font-weight:400;color:var(--text-faint);font-size:13px;">(8 days)</span>
+      </h3>
+      ${renderFlightCard(w.flight)}
+      ${renderHotelTable(w.hotels)}
+      <div class="total-callout" style="margin-top:2px;">
+        <span class="label">${w.label} total, 2 travelers: ${fmt(t.total)}</span>
+        <span class="val">${fmt(t.pp)} pp</span>
+      </div>
+      `;
+    }).join('<hr class="div" style="margin:26px 0;">')}
+
+    <hr class="div">
+    <h2 class="sec">💰 Compare the two</h2>
+    <div class="table-wrap">
+    <table class="ntable">
+      <thead><tr><th>Window</th><th>Dates</th><th class="num">Flights (2 trav)</th><th class="num">Accommodation</th><th class="num">Total</th><th class="num">Per person</th></tr></thead>
+      <tbody>
+        ${it.windows.map((w,i)=>{
+          const t = totals[i];
+          return `<tr><td>${w.label}</td><td>${w.dateRange}</td><td class="num">${fmt(t.flightsTotal)}</td><td class="num">${fmt(t.accom)}</td><td class="num" style="font-weight:600">${fmt(t.total)}</td><td class="num" style="font-weight:600">${fmt(t.pp)}</td></tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    </div>
+    <div class="callout">${it.note}</div>
+  </div>`;
+}
+
+function renderMain(){
+  document.getElementById('main').innerHTML = DATA.map((it,i)=>
+    `<div class="page${i===0?' active':''}" id="page-${it.id}">${it.isWindowPair ? renderWindowPage(it) : renderPage(it)}</div>`
+  ).join('');
+}
+
+const mapInstances = {};
+function initMap(it){
+  if(mapInstances[it.id]){ setTimeout(()=>mapInstances[it.id].invalidateSize(),0); return; }
+  const container = document.getElementById('map-'+it.id);
+  const map = L.map(container, {scrollWheelZoom:true});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution:'&copy; OpenStreetMap &copy; CARTO', subdomains:'abcd', maxZoom:19
+  }).addTo(map);
+
+  const bounds = [];
+  const latlngs = it.route.map(p=>[p.lat,p.lng]);
+  L.polyline(latlngs, {color:'#2383e2', weight:2.5, opacity:0.75}).addTo(map);
+
+  it.route.forEach(p=>{
+    const isAms = p.code==='AMS';
+    const stroke = p.tag==='snow' ? '#0b6e99' : p.tag==='nye' ? '#8a5b0f' : '#37352f';
+    const fill = isAms ? '#ffffff' : (p.tag==='snow' ? '#e7f3f8' : p.tag==='nye' ? '#fdecc8' : '#ffffff');
+    L.circleMarker([p.lat,p.lng], {radius:isAms?6:9, color:stroke, weight:2, fillColor:fill, fillOpacity:1})
+      .addTo(map).bindPopup(`<b>${p.name}</b><br>${p.blurb||''}`);
+    bounds.push([p.lat,p.lng]);
+  });
+
+  (it.daytrips||[]).forEach(p=>{
+    const base = it.route.find(r=>r.code===p.from);
+    if(base) L.polyline([[base.lat,base.lng],[p.lat,p.lng]], {color:'#9b9a97', weight:1.5, dashArray:'3 7'}).addTo(map);
+    const stroke = p.tag==='snow' ? '#0b6e99' : '#787774';
+    L.circleMarker([p.lat,p.lng], {radius:5.5, color:stroke, weight:2, fillColor:'#ffffff', fillOpacity:1})
+      .addTo(map).bindPopup(`<b>${p.name}</b> <span style="color:#9b9a97">(day trip)</span><br>${p.blurb||''}`);
+    bounds.push([p.lat,p.lng]);
+  });
+
+  map.fitBounds(bounds, {padding:[28,28]});
+  mapInstances[it.id] = map;
+}
+
+function selectPage(id){
+  document.querySelectorAll('.side-item').forEach(el=>el.classList.toggle('active', el.dataset.id===id));
+  document.querySelectorAll('.page').forEach(el=>el.classList.toggle('active', el.id==='page-'+id));
+  const it = DATA.find(x=>x.id===id);
+  requestAnimationFrame(()=>initMap(it));
+  window.scrollTo({top:0});
+}
+
+renderSidebar();
+renderMain();
+initMap(DATA[0]);
+</script>
+</body>
+</html>
