@@ -180,8 +180,88 @@
     .pill{font-size:11px; padding:3px 8px;}
   }
 
+  /* ---------- combo itinerary: accommodation table + map linking ---------- */
+  .geo-status{font-size:11.5px; color:var(--text-faint); margin-bottom:8px; display:flex; align-items:center; gap:6px;}
+  .geo-dot{width:7px; height:7px; border-radius:50%; background:#f0b429; animation:pulse 1.2s infinite ease-in-out; flex-shrink:0;}
+  .geo-dot.done{background:#2ecc71; animation:none;}
+  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.3;}}
+
+  .accom-group{margin-bottom:32px;}
+  .accom-group-title{
+    font-size:15px; font-weight:700; color:var(--text); margin:0 0 12px;
+    display:flex; align-items:center; gap:10px; padding-bottom:9px; border-bottom:2px solid var(--border);
+  }
+  .accom-group-count{
+    font-size:11px; font-weight:600; color:var(--text-faint); background:var(--bg-sidebar);
+    padding:3px 9px; border-radius:20px; margin-left:auto; border:1px solid var(--border);
+  }
+
+  .accom-table-wrap{border:1px solid var(--border); border-radius:10px; overflow:hidden;}
+  table.accom-table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  table.accom-table th{
+    text-align:left; padding:10px 14px; background:var(--bg-sidebar); color:var(--text-muted);
+    font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em;
+    border-bottom:1px solid var(--border); white-space:nowrap;
+  }
+  table.accom-table th.right, table.accom-table td.right{text-align:right;}
+  table.accom-table td{padding:13px 14px; border-bottom:1px solid #f1f1ef; vertical-align:middle;}
+  table.accom-table tr:last-child td{border-bottom:none;}
+  table.accom-table tbody tr{transition:background .12s;}
+  table.accom-table tbody tr:hover{background:var(--bg-hover);}
+  table.accom-table tbody tr.selected{background:#f2fbf5;}
+  table.accom-table tbody tr.selected:hover{background:#e9f7ee;}
+  table.accom-table tbody tr.selected td:first-child{box-shadow:inset 3px 0 0 #0f7a3d;}
+  table.accom-table tbody tr.highlight{background:#eaf4fd; box-shadow:inset 0 0 0 2px rgba(35,131,226,.4);}
+  .accom-row{scroll-margin-top:24px;}
+
+  .accom-name-cell{display:flex; flex-direction:column; gap:5px; min-width:0;}
+  .accom-name{font-weight:600; font-size:13.5px; line-height:1.4; color:var(--text);}
+  .accom-tags{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .accom-selected-badge{
+    display:inline-flex; align-items:center; gap:4px; background:#0f7a3d; color:#fff; font-size:10px; font-weight:700;
+    padding:2px 8px; border-radius:20px; letter-spacing:.02em;
+  }
+  .accom-note{font-size:12px; font-style:italic; color:var(--text-muted); line-height:1.5; margin-top:2px;}
+  .accom-price{font-family:var(--mono); font-weight:700; font-size:15px; color:var(--text); white-space:nowrap;}
+
+  .accom-actions{display:flex; gap:7px; justify-content:flex-end;}
+  .locate-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:5px; font-size:12px; font-weight:600; color:#fff;
+    background:#2383e2; border:none; border-radius:7px; padding:8px 12px; cursor:pointer;
+    min-height:36px; white-space:nowrap; transition:background .15s;
+  }
+  .locate-btn:hover{background:#1a6fc4;}
+  .accom-link-btn{
+    display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:var(--text);
+    background:#fff; border:1px solid var(--border); border-radius:7px; padding:8px 12px; text-decoration:none;
+    min-height:36px; white-space:nowrap; transition:background .15s, border-color .15s;
+  }
+  .accom-link-btn:hover{background:var(--bg-hover); border-color:#c3cede; text-decoration:none;}
+
+  .popup-locate-link{display:inline-block; margin-top:6px; font-size:12px; font-weight:600; cursor:pointer; color:#2383e2;}
+
+  /* phone: table collapses into stacked rows */
+  @media (max-width:600px){
+    .accom-table-wrap{border:none; border-radius:0;}
+    table.accom-table thead{display:none;}
+    table.accom-table, table.accom-table tbody, table.accom-table tr, table.accom-table td{display:block; width:100%;}
+    table.accom-table tr{
+      border:1px solid var(--border); border-radius:10px; margin-bottom:10px; padding:13px 14px;
+      background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.05);
+    }
+    table.accom-table tbody tr.selected{border-color:#0f7a3d; background:#f2fbf5;}
+    table.accom-table tbody tr.selected td:first-child{box-shadow:none;}
+    table.accom-table td{padding:0; border-bottom:none;}
+    table.accom-table td.right{text-align:left;}
+    table.accom-table td.price-cell{margin:8px 0 10px;}
+    .accom-price{font-size:18px;}
+    .accom-actions{justify-content:stretch; gap:8px;}
+    .locate-btn, .accom-link-btn{flex:1; min-height:40px; font-size:12.5px;}
+  }
+
   /* ---------- very narrow phones ---------- */
   @media (max-width:360px){
+
     .page-inner{padding:18px 10px 50px;}
     .page-inner h1{font-size:22px;}
     table.ntable{min-width:420px;}
@@ -496,6 +576,52 @@ const DATA = [
   flight:{legs:[], costPerPerson:596, altNote:null},
   price:{accom:869},
   note:'Two very different stops in one trip — Vienna\'s official NYE fireworks, then Tromsø for the Northern Lights. Flight price is a flat average estimate, not itemized per leg.'
+},
+{
+  id:'svt_combo', icon:'🧭', name:'Salzburg + Vienna + Tromsø (Super Combo)', subtitle:'Salzburg (+ Hallstatt) → Vienna (NYE) → Tromsø (Northern Lights)',
+  countries:'Austria, Norway', dates:'Dec 28 – Jan 7 · 11 days', tags:['snow','nye','aurora'],
+  hasLocationMap:true,
+  route:[
+    {code:'AMS', name:'Amsterdam', lat:52.3676, lng:4.9041, mode:null, blurb:'Departure'},
+    {code:'SZG', name:'Salzburg', lat:47.8002, lng:13.0455, mode:'✈ flight', tag:'snow', blurb:'3 nights'},
+    {code:'VIE', name:'Vienna', lat:48.2087, lng:16.3738, mode:'🚆 train · westbahn', tag:'nye', blurb:'4 nights · NYE here'},
+    {code:'TOS', name:'Tromsø', lat:69.6492, lng:18.9560, mode:'✈ flight, 1 stop · ~8h25', tag:'aurora', blurb:'3 nights · Northern Lights'}
+  ],
+  daytrips:[{code:'HAL', name:'Hallstatt', lat:47.5622, lng:13.6493, from:'SZG', tag:'snow', blurb:'Day trip from Salzburg'}],
+  days:[
+    {d:1,date:'Dec 28',title:'Fly to Salzburg',desc:'Direct flight AMS → Salzburg. Settle into the Altstadt.',tags:[]},
+    {d:2,date:'Dec 29',title:'Salzburg old town',desc:'Mirabell Gardens, the Dom, Getreidegasse.',tags:[]},
+    {d:3,date:'Dec 30',title:'Hallstatt',desc:'1h15 to Austria\'s snowiest lake village.',tags:['snow']},
+    {d:4,date:'Dec 31',title:'Salzburg → Vienna, then NYE',desc:'Morning free, train to Vienna, then Silvesterpfad — official midnight fireworks at Rathausplatz.',tags:['nye']},
+    {d:5,date:'Jan 1',title:'Recover',desc:'Free New Year\'s Concert broadcast at Stephansplatz.',tags:[]},
+    {d:6,date:'Jan 2',title:'Schönbrunn',desc:'Full day at the palace and gardens.',tags:[]},
+    {d:7,date:'Jan 3',title:'Vienna free day',desc:'Belvedere, Naschmarkt, or the Ringstrasse.',tags:[]},
+    {d:8,date:'Jan 4',title:'Fly to Tromsø',desc:'Air Serbia, via Belgrade, ~8h25 total with a ~3h stop.',tags:[]},
+    {d:9,date:'Jan 5',title:'Arctic Cathedral & waterfront',desc:'Free self-guided aurora watch after dark.',tags:['aurora']},
+    {d:10,date:'Jan 6',title:'Fjellheisen cable car',desc:'Panoramic views by day, another aurora attempt after dark.',tags:['aurora']},
+    {d:11,date:'Jan 7',title:'Fly home',desc:'Tromsø → Amsterdam.',tags:[]}
+  ],
+  accommodations:[
+    {city:'Salzburg', name:'DAD Vogelweiderhof Rooms', source:'Booking.com', total:401, notes:null, url:'https://www.booking.com/hotel/at/dad-vogelweiderhof-rooms.en-gb.html?aid=2311236&checkin=2026-12-28&checkout=2026-12-31', address:'Vogelweiderstraße 93a, 5020 Salzburg, Austria', selected:true},
+    {city:'Salzburg', name:'Hotel Vogelweiderhof', source:'Booking.com', total:390, notes:null, url:'https://www.booking.com/hotel/at/und-restaurant-vogelweiderhof.en-gb.html?aid=2311236&checkin=2026-12-28&checkout=2026-12-31', address:'Vogelweiderstraße 93 b, Schallmoos, 5020 Salzburg, Austria', selected:false},
+    {city:'Salzburg', name:'Hotel Turnerwirt', source:'Booking.com', total:400, notes:null, url:'https://www.booking.com/hotel/at/hotelturnerwirt.en-gb.html?aid=2311236&checkin=2026-12-28&checkout=2026-12-31', address:'Linzer Bundesstraße 54, Gnigl, 5023 Salzburg, Austria', selected:false},
+    {city:'Vienna', name:'smartments Wien Heiligenstadt', source:'Booking.com', total:478, notes:'a bit far', url:'https://www.booking.com/hotel/at/smartments-business-wien-heiligenstadt.en-gb.html?aid=2311236&checkin=2026-12-31&checkout=2027-01-04', address:'Leopold Unger Platz 3, 19. Döbling, 1190 Vienna, Austria', selected:false},
+    {city:'Vienna', name:'CityPrime Apartments Vienna', source:'Booking.com', total:427, notes:'super good location', url:'https://www.booking.com/hotel/at/cityhit1020-treasure-home-top12.en-gb.html?aid=2311236&checkin=2026-12-31&checkout=2027-01-04', address:'5 Schweidlgasse, 02. Leopoldstadt, 1020 Vienna, Austria', selected:false},
+    {city:'Vienna', name:'Licht en modern stadsappartement TG10', source:'Airbnb', total:418, notes:'also really cool', url:'https://www.airbnb.nl/rooms/1119615189609600227?adults=2&check_in=2026-12-31&check_out=2027-01-04', address:'Liechtensteinstraße 48, 1090 Wien, Austria', selected:true},
+    {city:'Vienna', name:'Alles in EEN - uitzicht op de tuin en -gebruik', source:'Airbnb', total:426, notes:'a bit far, but place is super cool', url:'https://www.airbnb.nl/rooms/948244887923137154?adults=2&check_in=2026-12-31&check_out=2027-01-04', address:'Ruthgasse, 1190 Wien, Austria', selected:false},
+    {city:'Tromsø', name:'Centrally located home with outdoor areas', source:'Airbnb', total:475, notes:'super nice option with amazing view over the mountains — not really in the city (maybe)', url:'https://www.airbnb.co.uk/rooms/924019421490521778?adults=2&check_in=2027-01-04&check_out=2027-01-07', address:'Stalheimvegen 35, 9012 Tromsø, Norway', selected:true},
+    {city:'Tromsø', name:'Cosy apartment with a view of Tromsø', source:'Airbnb', total:466, notes:'nice apartment with nice view — a bit too far from city center', url:'https://www.airbnb.co.uk/rooms/1745479836757396924?adults=2&check_in=2027-01-04&check_out=2027-01-07', address:'Vegavegen 17, 9024 Tomasjord, Norway', selected:false},
+    {city:'Tromsø', name:'Cozy apartment near Sherpa steps', source:'Airbnb', total:479, notes:'nice and modern apartment in great location for city and hiking exploring', url:'https://www.airbnb.co.uk/rooms/1328330006949645496?adults=2&check_in=2027-01-04&check_out=2027-01-07', address:'Ringstadvegen 1, 9020 Tromsdalen, Norway', selected:false}
+  ],
+  flight:{
+    legs:[
+      {route:'AMS → SZG', mode:'flight', carrier:'transavia', date:'Dec 28', dep:'14:20', arr:'15:55'},
+      {route:'SZG → VIE', mode:'train', carrier:'westbahn', date:'Dec 31', dep:'10:52', arr:'13:22'},
+      {route:'VIE → TOS', mode:'flight', carrier:'Air Serbia', date:'Jan 4', dep:'09:45', arr:'18:10', note:'1 stop in Belgrade, ~3h layover'},
+      {route:'TOS → AMS', mode:'flight', carrier:'transavia', date:'Jan 7', dep:'09:45', arr:'13:10'}
+    ], costPerPerson:393
+  },
+  note:'Three stops, three very different moods — Salzburg\'s Alpine old town, Vienna\'s official NYE fireworks, then Tromsø for the Northern Lights. The Vienna→Tromsø leg routes through Belgrade with Air Serbia — check that connection time works for you before booking.'
 }
 ];
 
@@ -513,6 +639,9 @@ function renderSidebar(){
       const t = it.windows.map(windowTotals);
       const lo = Math.min(...t.map(x=>x.pp)), hi = Math.max(...t.map(x=>x.pp));
       priceLabel = lo===hi ? fmt(lo) : `${fmt(lo)}–${fmt(hi)}`;
+    } else if(it.hasLocationMap){
+      const accomTotal = it.accommodations.filter(a=>a.selected).reduce((s,a)=>s+a.total,0);
+      priceLabel = fmt(Math.round((it.flight.costPerPerson*2 + accomTotal)/2));
     } else {
       priceLabel = fmt(Math.round((it.flight.costPerPerson*2 + it.price.accom)/2));
     }
@@ -743,9 +872,127 @@ function renderWindowPage(it){
   </div>`;
 }
 
+function renderAccomRow(it, a, idx){
+  const noteHtml = a.notes ? `<div class="accom-note">"${a.notes}"</div>` : '';
+  return `<tr class="accom-row${a.selected?' selected':''}" id="accom-${it.id}-${idx}">
+    <td>
+      <div class="accom-name-cell">
+        <div class="accom-tags">
+          <span class="pill src" style="padding:2px 8px;font-size:10px;">${a.source}</span>
+          ${a.selected ? '<span class="accom-selected-badge">✓ Selected</span>' : ''}
+        </div>
+        <div class="accom-name">${a.name}</div>
+        ${noteHtml}
+      </div>
+    </td>
+    <td class="right price-cell"><span class="accom-price">${fmt(a.total)}</span></td>
+    <td class="right">
+      <div class="accom-actions">
+        <button class="locate-btn" onclick="locateAccommodation('${it.id}', ${idx}, this)">📍 Locate</button>
+        <a class="accom-link-btn" href="${a.url}" target="_blank" rel="noopener">View →</a>
+      </div>
+    </td>
+  </tr>`;
+}
+
+function renderComboMapPage(it){
+  const accomTotal = it.accommodations.filter(a=>a.selected).reduce((s,a)=>s+a.total,0);
+  const flightsTotal = it.flight.costPerPerson * 2;
+  const total = flightsTotal + accomTotal;
+  const pp = Math.round(total/2);
+  const cities = [...new Set(it.accommodations.map(a=>a.city))];
+
+  return `<div class="page-inner">
+    <div class="page-icon">${it.icon}</div>
+    <h1>${it.name}</h1>
+    <div class="page-sub">${it.subtitle}</div>
+
+    <div class="props">
+      <div class="prow"><div class="plabel">📍 Countries</div><div class="pvalue">${it.countries}</div></div>
+      <div class="prow"><div class="plabel">📅 Dates</div><div class="pvalue">${it.dates}</div></div>
+      <div class="prow"><div class="plabel">✈️ Departure</div><div class="pvalue">Amsterdam (AMS)</div></div>
+      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong">${fmt(pp)}</div></div>
+    </div>
+    <div class="pills">${it.tags.map(t=>`<span class="pill ${t}">${tagLabel[t]}</span>`).join('')}</div>
+    ${it.flag ? `<div class="callout flag">⚠️ ${it.flag}</div>` : ''}
+
+    <hr class="div">
+    <h2 class="sec">🗺️ The route & every accommodation option</h2>
+    <div class="geo-status" id="geo-status-${it.id}"><span class="geo-dot"></span> Locating accommodation pins…</div>
+    <div class="mapbox" id="map-${it.id}"></div>
+    <div class="map-cap">Drag to pan, scroll to zoom, click any pin — including accommodation options — for details. Every "📍 Locate on map" button below jumps straight to that pin.</div>
+
+    <h2 class="sec">📅 Day by day</h2>
+    ${it.days.map(d=>`
+      <details class="day" open>
+        <summary>
+          <span class="day-badge">${String(d.d).padStart(2,'0')}</span>
+          <span class="day-date">${d.date}</span>
+          <span class="day-title">${d.title}${d.tags.map(t=>`<span class="day-tag pill ${t}">${tagLabel[t]}</span>`).join('')}</span>
+        </summary>
+        <div class="day-content">${d.desc}</div>
+      </details>
+    `).join('')}
+
+    <hr class="div">
+    <h2 class="sec">🏨 Compare every accommodation option</h2>
+    ${cities.map(city=>{
+      const cityOptions = it.accommodations
+        .map((a,idx)=>({a,idx}))
+        .filter(x=>x.a.city===city)
+        .sort((x,y)=>(y.a.selected?1:0)-(x.a.selected?1:0));
+      return `
+      <div class="accom-group">
+        <div class="accom-group-title">${city}<span class="accom-group-count">${cityOptions.length} options</span></div>
+        <div class="accom-table-wrap">
+          <table class="accom-table">
+            <thead><tr><th>Property</th><th class="right">Total</th><th class="right">Actions</th></tr></thead>
+            <tbody>
+              ${cityOptions.map(x=>renderAccomRow(it,x.a,x.idx)).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;}).join('')}
+    <div class="callout">✓ Private double room · ✓ Private bathroom · Real picks from your own Booking.com + Airbnb research. Click 📍 on any card to find it on the map above, or click a map pin to jump back down here.</div>
+
+    <hr class="div">
+    <h2 class="sec">✈️ Travel — 4 legs</h2>
+    <div class="flight-card">
+      ${it.flight.legs.map(l=>`
+        <div class="flight-leg">
+          <span class="flight-route">${l.mode==='train'?'🚆':'✈️'} ${l.route}</span>
+          <span class="flight-meta">${l.carrier} · ${l.date} · ${l.dep}–${l.arr}${l.note?` · ${l.note}`:''}</span>
+        </div>
+      `).join('')}
+      <div class="flight-cost-row">
+        <span class="lbl">All 4 legs, per person</span>
+        <span class="val">${fmt(it.flight.costPerPerson)}</span>
+      </div>
+    </div>
+
+    <hr class="div">
+    <h2 class="sec">💰 The numbers — travel + hotels only</h2>
+    <div class="table-wrap">
+    <table class="ntable">
+      <tbody>
+        <tr><td>Travel (2 travelers, all 4 legs)</td><td class="num" colspan="4">${fmt(flightsTotal)}</td></tr>
+        <tr><td>Accommodation (your selected options)</td><td class="num" colspan="4">${fmt(accomTotal)}</td></tr>
+        <tr style="font-weight:600"><td>Total, 2 travelers</td><td class="num" colspan="4">${fmt(total)}</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="total-callout">
+      <span class="label">Per person</span>
+      <span class="val">${fmt(pp)}</span>
+    </div>
+    <div class="callout">${it.note}</div>
+  </div>`;
+}
+
 function renderMain(){
   document.getElementById('main').innerHTML = DATA.map((it,i)=>
-    `<div class="page${i===0?' active':''}" id="page-${it.id}">${it.isWindowPair ? renderWindowPage(it) : renderPage(it)}</div>`
+    `<div class="page${i===0?' active':''}" id="page-${it.id}">${it.hasLocationMap ? renderComboMapPage(it) : (it.isWindowPair ? renderWindowPage(it) : renderPage(it))}</div>`
   ).join('');
 }
 
@@ -782,6 +1029,168 @@ function initMap(it){
 
   map.fitBounds(bounds, {padding:[28,28]});
   mapInstances[it.id] = map;
+
+  if(it.hasLocationMap && it.accommodations){
+    geocodeAccommodations(it, map);
+  }
+}
+
+const geocodeCache = {};
+const accomMarkers = {};
+
+// Austrian/Norwegian addresses often carry district notation ("19. Döbling",
+// "02. Leopoldstadt") that Nominatim can't parse. Build progressively simpler
+// query variants and use the first that resolves.
+function addressVariants(address){
+  const variants = [];
+  const push = v => { v = v.replace(/\s*,\s*/g, ', ').replace(/,\s*,/g, ',').trim(); if(v && !variants.includes(v)) variants.push(v); };
+
+  push(address);
+
+  // drop "NN. DistrictName" segments
+  const noDistrict = address.replace(/,\s*\d{1,2}\.\s*[^,]+/g, '');
+  push(noDistrict);
+
+  // street + postcode + city + country
+  const parts = noDistrict.split(',').map(s=>s.trim()).filter(Boolean);
+  if(parts.length >= 2){
+    const street = parts[0];
+    const country = parts[parts.length-1];
+    const cityPart = parts[parts.length-2];
+    const cityNoZip = cityPart.replace(/\b\d{4,5}\b/, '').trim();
+
+    // house number written before the street name -> move it after
+    const lead = street.match(/^(\d+[a-zA-Z]?)\s+(.+)$/);
+    const streetForms = [street];
+    if(lead) streetForms.push(`${lead[2]} ${lead[1]}`);
+
+    // German-language street names are normally hyphenated
+    streetForms.slice().forEach(sf=>{
+      const m = sf.match(/^(.+?)\s+(\d+\s*[a-zA-Z]?)$/);
+      const namePart = m ? m[1] : sf;
+      const numPart = m ? m[2] : '';
+      if(namePart.split(/\s+/).length >= 3 && !namePart.includes('-')){
+        const hyph = namePart.replace(/\s+/g, '-');
+        streetForms.push(numPart ? `${hyph} ${numPart}` : hyph);
+      }
+    });
+
+    streetForms.forEach(sf=>{
+      push(`${sf}, ${cityPart}, ${country}`);
+      if(cityNoZip) push(`${sf}, ${cityNoZip}, ${country}`);
+    });
+  }
+  return variants;
+}
+
+function queryNominatim(q){
+  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+  return fetch(url, {headers:{'Accept':'application/json'}})
+    .then(r=>r.ok ? r.json() : [])
+    .then(results=>{
+      if(results && results.length){
+        return {lat:parseFloat(results[0].lat), lng:parseFloat(results[0].lon)};
+      }
+      return null;
+    })
+    .catch(()=>null);
+}
+
+async function geocodeAddress(address){
+  if(geocodeCache[address]) return geocodeCache[address];
+  const variants = addressVariants(address);
+  for(let i=0; i<variants.length; i++){
+    const loc = await queryNominatim(variants[i]);
+    if(loc){ geocodeCache[address] = loc; return loc; }
+    if(i < variants.length-1) await new Promise(res=>setTimeout(res, 1100));
+  }
+  return null;
+}
+
+function createAccomMarker(it, a, idx, loc, map){
+  const stroke = a.selected ? '#0f7a3d' : '#9b9a97';
+  const fill = a.selected ? '#ddf3e4' : '#ffffff';
+  const marker = L.circleMarker([loc.lat, loc.lng], {
+    radius: a.selected ? 8 : 6, color: stroke, weight: 2, fillColor: fill, fillOpacity: 1
+  }).addTo(map);
+  marker.bindPopup(
+    `<b>${a.name}</b>${a.selected?' ✓':''}<br>${a.source} · ${fmt(a.total)}` +
+    (a.notes ? `<br><i>"${a.notes}"</i>` : '') +
+    `<br><span class="popup-locate-link" onclick="scrollToAccommodation('${it.id}',${idx})">View details ↓</span>`
+  );
+  accomMarkers[it.id][idx] = marker;
+  return marker;
+}
+
+async function geocodeAccommodations(it, map){
+  accomMarkers[it.id] = [];
+  const statusEl = document.getElementById('geo-status-'+it.id);
+  let placed = 0;
+  for(let idx=0; idx<it.accommodations.length; idx++){
+    const a = it.accommodations[idx];
+    const loc = await geocodeAddress(a.address);
+    if(loc){ createAccomMarker(it, a, idx, loc, map); placed++; }
+    if(statusEl){
+      statusEl.innerHTML = `<span class="geo-dot"></span> Locating accommodation pins… ${placed}/${it.accommodations.length}`;
+    }
+    await new Promise(res=>setTimeout(res, 1100));
+  }
+  if(statusEl){
+    statusEl.innerHTML = `<span class="geo-dot done"></span> ${placed} of ${it.accommodations.length} accommodation pins located`;
+    setTimeout(()=>{ if(statusEl) statusEl.style.display='none'; }, 3000);
+  }
+}
+
+async function locateAccommodation(itId, idx, btn){
+  const it = DATA.find(x=>x.id===itId);
+  const map = mapInstances[itId];
+
+  // highlight the row straight away so the click always gives feedback
+  document.querySelectorAll('.accom-row').forEach(el=>el.classList.remove('highlight'));
+  const row = document.getElementById('accom-'+itId+'-'+idx);
+  if(row) row.classList.add('highlight');
+
+  const mapEl = document.getElementById('map-'+itId);
+  if(mapEl) mapEl.scrollIntoView({behavior:'smooth', block:'center'});
+  if(!map || !it) return;
+
+  accomMarkers[itId] = accomMarkers[itId] || [];
+  let marker = accomMarkers[itId][idx];
+
+  // pin not ready yet (still geocoding, or the address failed earlier) — fetch it now
+  if(!marker){
+    const original = btn ? btn.innerHTML : null;
+    if(btn){ btn.innerHTML = '⏳ Locating…'; btn.disabled = true; }
+    const loc = await geocodeAddress(it.accommodations[idx].address);
+    if(btn){ btn.innerHTML = original; btn.disabled = false; }
+    if(loc) marker = createAccomMarker(it, it.accommodations[idx], idx, loc, map);
+  }
+
+  if(!marker){
+    if(btn){
+      const original = btn.innerHTML;
+      btn.innerHTML = '📍 Not found';
+      setTimeout(()=>{ btn.innerHTML = original; }, 2000);
+    }
+    return;
+  }
+
+  // wait for the smooth scroll to settle, then move the map deterministically
+  setTimeout(()=>{
+    map.invalidateSize();
+    map.setView(marker.getLatLng(), 14, {animate:true, duration:0.6});
+    setTimeout(()=>marker.openPopup(), 400);
+  }, 500);
+}
+
+function scrollToAccommodation(itId, idx){
+  const row = document.getElementById('accom-'+itId+'-'+idx);
+  if(row){
+    row.scrollIntoView({behavior:'smooth', block:'center'});
+    document.querySelectorAll('.accom-row').forEach(el=>el.classList.remove('highlight'));
+    row.classList.add('highlight');
+    setTimeout(()=>row.classList.remove('highlight'), 2600);
+  }
 }
 
 function selectPage(id){
