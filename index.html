@@ -259,6 +259,95 @@
     .locate-btn, .accom-link-btn{flex:1; min-height:40px; font-size:12.5px;}
   }
 
+  /* ---------- Austria Grand Tour: selectable accommodation + travel ---------- */
+  .gt-stay{margin-bottom:30px;}
+  .gt-stay-head{
+    display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+    padding-bottom:9px; border-bottom:2px solid var(--border); margin-bottom:12px;
+  }
+  .gt-stay-city{font-size:15px; font-weight:700;}
+  .gt-stay-dates{font-size:12.5px; color:var(--text-faint);}
+  .gt-stay-count{
+    font-size:11px; font-weight:600; color:var(--text-faint); background:var(--bg-sidebar);
+    padding:3px 9px; border-radius:20px; margin-left:auto; border:1px solid var(--border);
+  }
+
+  .gt-opt{
+    display:flex; gap:12px; align-items:flex-start; padding:13px 14px; border:1px solid var(--border);
+    border-radius:10px; margin-bottom:8px; background:#fff; cursor:pointer;
+    transition:border-color .13s, background .13s, box-shadow .13s; scroll-margin-top:24px;
+  }
+  .gt-opt:hover{border-color:#c3cede; background:#fcfcfb;}
+  .gt-opt.chosen{border-color:#0f7a3d; background:#f3fbf6; box-shadow:inset 3px 0 0 #0f7a3d;}
+  .gt-opt.highlight{box-shadow:0 0 0 3px rgba(35,131,226,.35); border-color:#2383e2;}
+
+  .gt-radio{
+    flex-shrink:0; width:20px; height:20px; border-radius:50%; border:2px solid #c9c9c6;
+    margin-top:2px; position:relative; transition:border-color .13s;
+  }
+  .gt-opt.chosen .gt-radio{border-color:#0f7a3d;}
+  .gt-opt.chosen .gt-radio::after{
+    content:''; position:absolute; inset:3px; border-radius:50%; background:#0f7a3d;
+  }
+
+  .gt-rank{
+    flex-shrink:0; width:24px; height:24px; border-radius:6px; background:var(--bg-sidebar);
+    border:1px solid var(--border); font-size:11.5px; font-weight:700; color:var(--text-muted);
+    display:flex; align-items:center; justify-content:center; margin-top:0;
+  }
+  .gt-opt.chosen .gt-rank{background:#0f7a3d; border-color:#0f7a3d; color:#fff;}
+
+  .gt-body{flex:1; min-width:0;}
+  .gt-line1{display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin-bottom:4px;}
+  .gt-name{font-weight:600; font-size:14px; line-height:1.35;}
+  .gt-note{font-size:12.5px; color:var(--text-muted); font-style:italic; line-height:1.5; margin-top:5px;}
+  .gt-actions{display:flex; align-items:center; gap:8px; margin-top:9px; flex-wrap:wrap;}
+  .gt-price{font-family:var(--mono); font-weight:700; font-size:16px; white-space:nowrap; margin-left:auto; padding-left:10px;}
+
+  .gt-btn{
+    display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600;
+    border-radius:7px; padding:7px 11px; cursor:pointer; min-height:34px; text-decoration:none;
+    border:1px solid var(--border); background:#fff; color:var(--text); transition:background .13s,border-color .13s;
+  }
+  .gt-btn:hover{background:var(--bg-hover); border-color:#c3cede; text-decoration:none;}
+  .gt-btn.primary{background:#2383e2; border-color:#2383e2; color:#fff;}
+  .gt-btn.primary:hover{background:#1a6fc4;}
+  .gt-btn.warn{background:#fff6e5; border-color:#e8c98a; color:#8a5b0f;}
+  .gt-btn.warn:hover{background:#fdeecd;}
+  .gt-btn[disabled]{opacity:.55; cursor:default;}
+
+  /* travel timeline */
+  .gt-leg{
+    display:flex; gap:12px; align-items:flex-start; padding:13px 14px;
+    border:1px solid var(--border); border-radius:10px; margin-bottom:8px; background:#fff;
+  }
+  .gt-leg-icon{
+    flex-shrink:0; width:34px; height:34px; border-radius:9px; background:var(--bg-sidebar);
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px;
+  }
+  .gt-leg-body{flex:1; min-width:0;}
+  .gt-leg-route{font-weight:700; font-size:13.5px; font-family:var(--mono); margin-bottom:3px;}
+  .gt-leg-meta{font-size:12.5px; color:var(--text-muted); line-height:1.5;}
+  .gt-leg-note{font-size:11.5px; color:var(--text-faint); font-style:italic; margin-top:4px; line-height:1.45;}
+  .gt-leg-cost{font-family:var(--mono); font-weight:700; font-size:14px; white-space:nowrap; padding-left:10px;}
+
+  /* live total bar */
+  .gt-total-card{border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:8px;}
+  .gt-total-row{display:flex; justify-content:space-between; align-items:center; padding:11px 15px; font-size:13.5px; border-bottom:1px solid var(--border);}
+  .gt-total-row:last-child{border-bottom:none;}
+  .gt-total-row .v{font-family:var(--mono); font-weight:600;}
+  .gt-total-row.sum{background:var(--bg-sidebar); font-weight:700;}
+  .gt-missing{font-size:12px; color:#8a5b0f; background:#fff6e5; padding:9px 14px; border-radius:7px; margin-bottom:10px;}
+
+  @media (max-width:600px){
+    .gt-opt{padding:12px; gap:9px;}
+    .gt-price{margin-left:0; padding-left:0; font-size:15px; width:100%; margin-top:6px;}
+    .gt-line1{gap:6px;}
+    .gt-leg{padding:12px; gap:9px;}
+    .gt-leg-cost{padding-left:0;}
+    .gt-btn{font-size:11px; padding:7px 9px;}
+  }
+
   /* ---------- very narrow phones ---------- */
   @media (max-width:360px){
 
@@ -282,40 +371,405 @@
 const tagLabel = {snow:'❄ Snow', nye:'🎆 NYE', warm:'☀ Warm', aurora:'🌌 Aurora'};
 function fmt(n){ return '€' + Math.round(n).toLocaleString('en-US'); }
 
+const AUSTRIA_GT = {
+ "stays": [
+  {
+   "city": "Vienna",
+   "label": "Dec 29 - Jan 1 (3 nights)",
+   "options": [
+    {
+     "rank": 1,
+     "source": "Airbnb",
+     "name": "2 balcony apartment in top location",
+     "total": 447.0,
+     "notes": "nice apartment in great location for cafes and restaurants",
+     "url": "https://www.airbnb.com/rooms/1197156609865632935?adults=2&check_in=2026-12-29&check_out=2027-01-01&search_mode=regular_search&source_impression_id=p3_1786834848_P3oEsFmcZhq6oAld&previous_page_section_name=1000&federated_search_id=e805f598-91a2-40aa-bbcf-8ee0b3b57b81",
+     "geo": null
+    },
+    {
+     "rank": 2,
+     "source": "Airbnb",
+     "name": "Praterhood Elegant Suites",
+     "total": 420.0,
+     "notes": "super cute apartment, location is fine",
+     "url": "https://www.airbnb.com/rooms/1526995422925450176?adults=2&check_in=2026-12-29&check_out=2027-01-01&location=Vienna&search_mode=regular_search&source_impression_id=p3_1786833673_P3VQoE1Fhqz3N8PX&previous_page_section_name=1001&federated_search_id=9740ae8d-0546-439a-8641-561d11b72851",
+     "geo": "Praterhood Elegant Suites, Vienna, Austria"
+    },
+    {
+     "rank": 3,
+     "source": "Airbnb",
+     "name": "Modern city apartment for 4 | Prater Vienna",
+     "total": 494.0,
+     "notes": "super nice and cozy in great location",
+     "url": "https://www.airbnb.com/rooms/1402224651928738353?adults=2&check_in=2026-12-29&check_out=2027-01-01&location=Vienna&search_mode=regular_search&source_impression_id=p3_1786833613_P3d_CcUZVbcA3_mm&previous_page_section_name=1001&federated_search_id=f1ca6fb9-25b9-4d6d-a31b-c993e78d566f",
+     "geo": null
+    },
+    {
+     "rank": 4,
+     "source": "Airbnb",
+     "name": "Spacious calm plant filled home",
+     "total": 439.0,
+     "notes": "house full of plants and a roof terrace. Location is great for caffes",
+     "url": "https://www.airbnb.com/rooms/1217415626400095277?adults=2&check_in=2026-12-29&check_out=2027-01-01&search_mode=regular_search&source_impression_id=p3_1786834811_P3unYdrnkLaMh0-E&previous_page_section_name=1000&federated_search_id=5db34830-9033-4822-b784-995e4dc9786b",
+     "geo": null
+    },
+    {
+     "rank": 5,
+     "source": "Booking.com",
+     "name": "Simm's Hotel - cityhotel next to Metro U3",
+     "total": 665.0,
+     "notes": "cool hotel close to metro. Best room can be 617 euros non refundable",
+     "url": "https://www.booking.com/hotel/at/simma-s.en-gb.html?label=de-at-booking-desktop-pOrc*3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&aid=2311236&ucfs=1&checkin=2026-12-29&checkout=2027-01-01&dest_id=-1995499&dest_type=city&group_adults=2&no_rooms=1&group_children=0&sr_order=price&nflt=oos%3D1%3Bprice%3DEUR-min-210-1%3Breview_score%3D80%3Bht_id%3D204%3Broomfacility%3D38%3Bht_id%3D201%3Broomfacility%3D11%3Bclass%3D4&srpvid=5a6c9d6e281c011b&srepoch=1786833215&all_sr_blocks=44177604_88520015_2_2_0&highlighted_blocks=44177604_88520015_2_2_0&matching_block_id=44177604_88520015_2_2_0&atlas_src=sr_iw_title",
+     "geo": "Simm's Hotel, Vienna, Austria"
+    },
+    {
+     "rank": 6,
+     "source": "Airbnb",
+     "name": "AC Apartment at Prater & Messe",
+     "total": 590.0,
+     "notes": "complete apartment in a splendid location",
+     "url": "https://www.airbnb.com/rooms/1744290195041234608?adults=2&check_in=2026-12-29&check_out=2027-01-01&location=Vienna&search_mode=regular_search&source_impression_id=p3_1786833610_P3HrgdyVLTHxZJ4w&previous_page_section_name=1001&federated_search_id=f1ca6fb9-25b9-4d6d-a31b-c993e78d566f",
+     "geo": null
+    },
+    {
+     "rank": 7,
+     "source": "Booking.com",
+     "name": "JUFA Hotel Wien City",
+     "total": 565.0,
+     "notes": "hotel looks fine, nice location, but there are not so many images about the room",
+     "url": "https://www.booking.com/hotel/at/jufa-wien.en-gb.html?label=de-at-booking-desktop-pOrc*3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&aid=2311236&ucfs=1&checkin=2026-12-29&checkout=2027-01-01&dest_id=-1995499&dest_type=city&group_adults=2&no_rooms=1&group_children=0&sr_order=price&nflt=oos%3D1%3Bprice%3DEUR-min-210-1%3Breview_score%3D80%3Bht_id%3D204%3Broomfacility%3D38%3Bht_id%3D201%3Broomfacility%3D11%3Bclass%3D4&srpvid=5a6c9d6e281c011b&srepoch=1786833215&all_sr_blocks=31396101_91472002_0_34_0&highlighted_blocks=31396101_91472002_0_34_0&matching_block_id=31396101_91472002_0_34_0&atlas_src=sr_iw_title",
+     "geo": "JUFA Hotel Wien City, Vienna, Austria"
+    },
+    {
+     "rank": 8,
+     "source": "Booking.com",
+     "name": "OLIVER pulse I Apartments with self check-in",
+     "total": 639.0,
+     "notes": "nice full apartment in good location and with balcony",
+     "url": "https://www.booking.com/hotel/at/oliver-pulse-apartments-with-self-check-in.en-gb.html?aid=2311236&label=de-at-booking-desktop-pOrc%2A3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&sid=8818f573db48c6696ddce54586f1ca96&all_sr_blocks=1547589801_425999427_2_0_0&checkin=2026-12-29&checkout=2027-01-01&dest_id=15475898&dest_type=hotel&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=1547589801_425999427_2_0_0&hpos=1&matching_block_id=1547589801_425999427_2_0_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=1547589801_425999427_2_0_0__56700&srepoch=1786881007&srpvid=a9ea53330cc42f2c&type=total&ucfs=1&",
+     "geo": "OLIVER pulse Apartments, Vienna, Austria"
+    }
+   ]
+  },
+  {
+   "city": "Innsbruck",
+   "label": "Jan 1 - Jan 3 (2 nights)",
+   "options": [
+    {
+     "rank": 1,
+     "source": "Airbnb",
+     "name": "Quiet Alpine Loft · central, bright & cozy",
+     "total": 455.0,
+     "notes": "best location for city explore and mountain adventure. ",
+     "url": "https://www.airbnb.com/rooms/1537806311570150227?adults=2&check_in=2027-01-01&check_out=2027-01-03&search_mode=regular_search&source_impression_id=p3_1786835254_P3I4pca1fhD2t1GX&previous_page_section_name=1000&federated_search_id=e77de4fe-285d-4956-9e76-e1ce0efa0db6",
+     "geo": null
+    },
+    {
+     "rank": 2,
+     "source": "Airbnb",
+     "name": "Panorama in the heart of the city",
+     "total": 414.0,
+     "notes": "entire condo in nice location in the city",
+     "url": "https://www.airbnb.com/rooms/997499738276855766?adults=2&check_in=2027-01-01&check_out=2027-01-03&search_mode=regular_search&source_impression_id=p3_1786835254_P3VqsO3WJ07ARQYm&previous_page_section_name=1000&federated_search_id=e77de4fe-285d-4956-9e76-e1ce0efa0db6",
+     "geo": null
+    },
+    {
+     "rank": 3,
+     "source": "Airbnb",
+     "name": "*Mountain view* Modern apartment-Mils near Hall",
+     "total": 310.0,
+     "notes": "Cheap and very nice place. But far away from Innsburg ",
+     "url": "https://www.airbnb.com/rooms/1141816565430691425?adults=2&check_in=2027-01-01&check_out=2027-01-03&location=Innsbruck&search_mode=regular_search&source_impression_id=p3_1786835647_P3Lom6eY_NCHEaOQ&previous_page_section_name=1001&federated_search_id=eb2efb4c-307e-4608-8187-1fe969b4525d",
+     "geo": "Mils bei Hall, Tirol, Austria"
+    },
+    {
+     "rank": 4,
+     "source": "Booking.com",
+     "name": "MEININGER Hotel Innsbruck Zentrum",
+     "total": 516.0,
+     "notes": "hotel in center of city. Only two bed option, we will put them together :))",
+     "url": "https://www.booking.com/hotel/at/meininger-innsbruck-zentrum.en-gb.html?label=de-at-booking-desktop-pOrc*3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&aid=2311236&ucfs=1&checkin=2027-01-01&checkout=2027-01-03&dest_id=-1981445&dest_type=city&group_adults=2&no_rooms=1&group_children=0&sr_order=price&nflt=oos%3D1%3Bprice%3DEUR-min-310-1%3Broomfacility%3D38%3Bdistance%3D1000&srpvid=9201a262b8fa00db&srepoch=1786835212&all_sr_blocks=722790502_309707536_0_2_0_495990&highlighted_blocks=722790502_309707536_0_2_0_495990&matching_block_id=722790502_309707536_0_2_0_495990&atlas_src=sr_iw_title",
+     "geo": "MEININGER Hotel Innsbruck Zentrum, Innsbruck, Austria"
+    }
+   ]
+  },
+  {
+   "city": "Salzburg",
+   "label": "Jan 3 - Jan 4 (1 night)",
+   "options": [
+    {
+     "rank": 1,
+     "source": "Booking.com",
+     "name": "Hotel Salzburg-Hauptbahnhof",
+     "total": 111.0,
+     "notes": "nice room in the center close to train station",
+     "url": "https://www.booking.com/hotel/at/h-hotel-salzburg.en-gb.html?label=de-at-booking-desktop-pOrc*3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&aid=2311236&ucfs=1&checkin=2027-01-03&checkout=2027-01-04&dest_id=-1989985&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Bprice%3DEUR-min-140-1%3Broomfacility%3D38%3Bclass%3D4&srpvid=e9d6a3f2f4e70161&srepoch=1786836026&all_sr_blocks=7140801_441596744_2_2_0&highlighted_blocks=7140801_441596744_2_2_0&matching_block_id=7140801_441596744_2_2_0&atlas_src=sr_iw_title",
+     "geo": "Hotel Salzburg Hauptbahnhof, Salzburg, Austria"
+    },
+    {
+     "rank": 2,
+     "source": "Booking.com",
+     "name": "Cocoon Salzburg Hauptbahnhof",
+     "total": 112.0,
+     "notes": "nice room in the center close to train station",
+     "url": "https://www.booking.com/hotel/at/cocoon-salzburg.en-gb.html?label=de-at-booking-desktop-pOrc*3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&aid=2311236&ucfs=1&checkin=2027-01-03&checkout=2027-01-04&dest_id=-1989985&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Bprice%3DEUR-min-140-1%3Broomfacility%3D38%3Bclass%3D4&srpvid=e9d6a3f2f4e70161&srepoch=1786836026&all_sr_blocks=782505901_337715564_2_2_0&highlighted_blocks=782505901_337715564_2_2_0&matching_block_id=782505901_337715564_2_2_0&atlas_src=sr_iw_title",
+     "geo": "Cocoon Hotel Salzburg, Salzburg, Austria"
+    },
+    {
+     "rank": 3,
+     "source": "Booking.com",
+     "name": "JUFA Hotel Salzburg City",
+     "total": 100.0,
+     "notes": "nice place but it's a bit more far away",
+     "url": "https://www.booking.com/hotel/at/jufa-salzburg-city.en-gb.html?label=de-at-booking-desktop-pOrc*3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&aid=2311236&ucfs=1&checkin=2027-01-03&checkout=2027-01-04&dest_id=-1989985&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Broomfacility%3D38%3Bclass%3D4&srpvid=e9d6a3f2f4e70161&srepoch=1786836000&all_sr_blocks=7444603_91461463_0_2_0&highlighted_blocks=7444603_91461463_0_2_0&matching_block_id=7444603_91461463_0_2_0&atlas_src=sr_iw_title",
+     "geo": "JUFA Hotel Salzburg City, Salzburg, Austria"
+    }
+   ]
+  },
+  {
+   "city": "Cabin",
+   "label": "Jan 4 - Jan 7 (3 nights) - Car Only",
+   "options": [
+    {
+     "rank": 1,
+     "source": "Booking.com",
+     "name": "Gosau Apartment 006",
+     "total": 339.0,
+     "notes": "Entire apartment in a mountain house (like Livignio). Super great location to relax, go for hikes, ski, sled, and visit Hallstatt. THey offer free wellness stuff. Also available on Airbnb for 310 euros.",
+     "url": "https://www.booking.com/hotel/at/gosau-apartment.en-gb.html?aid=2311236&label=de-at-booking-desktop-pOrc%2A3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&sid=efc3b5918d8115f2d5e3fe87d020ae92&all_sr_blocks=421744901_172863336_2_0_0&checkin=2027-01-04&checkout=2027-01-07&dest_id=4217449&dest_type=hotel&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=421744901_172863336_2_0_0&hpos=1&matching_block_id=421744901_172863336_2_0_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=421744901_172863336_2_0_0__33900&srepoch=1786836566&srpvid=c62ba527ab97010a&type=total&ucfs=1&",
+     "geo": "Gosau, Upper Austria, Austria"
+    },
+    {
+     "rank": 2,
+     "source": "Airbnb",
+     "name": "Wellness oasis in the countryside",
+     "total": 381.0,
+     "notes": "remote (cubic) cabin with suana",
+     "url": "https://www.airbnb.com/rooms/36938694?adults=2&check_in=2027-01-04&check_out=2027-01-07&location=Austria&search_mode=regular_search&amenities%5B%5D=223&source_impression_id=p3_1786838759_P3N6kSwHzXMZgIQn&previous_page_section_name=1001&federated_search_id=d21ceec9-5b29-476f-9707-ca536cd94d39",
+     "geo": null
+    },
+    {
+     "rank": 3,
+     "source": "Airbnb",
+     "name": "Mountain Lake Suite",
+     "total": 379.0,
+     "notes": "Apartment with mountain view. Close to another lake (we can see one more pretty town). Aparently nice for hiking",
+     "url": "https://www.airbnb.com/rooms/969401162348002052?adults=1&check_in=2027-01-04&check_out=2027-01-07&search_mode=regular_search&source_impression_id=p3_1786836887_P3gKRwjnOEZqWPxQ&previous_page_section_name=1000&federated_search_id=04049cd9-5e7a-474a-9bd5-b39f8018c26c",
+     "geo": null
+    },
+    {
+     "rank": 4,
+     "source": "Airbnb",
+     "name": "Noemi SPA apartment with a unique panoramic view",
+     "total": 408.0,
+     "notes": "Entire apartment in a mountain house (like Livignio). Super great location to relax, go for hikes, ski, sled, and visit Hallstatt.",
+     "url": "https://www.airbnb.com/rooms/44221681?adults=1&check_in=2027-01-04&check_out=2027-01-07&location=Bad%20Goisern%20am%20Hallst%C3%A4ttersee%2C%20Austria&search_mode=regular_search&amenities%5B%5D=223&source_impression_id=p3_1786837587_P3GOpEWsbuLO0tLn&previous_page_section_name=1001&federated_search_id=7a41a891-724e-4183-ad6e-834d66021d47",
+     "geo": "Bad Goisern am Hallstättersee, Austria"
+    },
+    {
+     "rank": 5,
+     "source": "Airbnb",
+     "name": "Radmer log cabin",
+     "total": 468.0,
+     "notes": "woden cabin house in the mountains with balcony and amazing view",
+     "url": "https://www.airbnb.com/rooms/35533948?adults=1&check_in=2027-01-04&check_out=2027-01-07&location=Austria&search_mode=regular_search&source_impression_id=p3_1786878597_P3jmAwIOvHjlC0Jh&previous_page_section_name=1001&federated_search_id=164cd62a-aaab-4cf7-9523-d5f54529c3a4",
+     "geo": "Radmer, Styria, Austria"
+    },
+    {
+     "rank": 6,
+     "source": "Airbnb",
+     "name": "Eisenerz vacation home",
+     "total": 481.0,
+     "notes": "house in the mountain (remote), sled included, close to ski and hiking areas. a bit far in the east",
+     "url": "https://www.airbnb.com/rooms/39813154?adults=2&check_in=2027-01-04&check_out=2027-01-07&location=Austria&search_mode=regular_search&source_impression_id=p3_1786838289_P3jTMk8DS4UFkblu&previous_page_section_name=1001&federated_search_id=60730f86-3aad-4887-b879-6d4a44187a29",
+     "geo": "Eisenerz, Styria, Austria"
+    },
+    {
+     "rank": 7,
+     "source": "Airbnb",
+     "name": "Rodlhaus GruBÄR",
+     "total": 590.0,
+     "notes": "entire big cabin house with sauna. a bit too pricy, 2h drive to hallstatt. for the rest it is the house we look for",
+     "url": "https://www.airbnb.com/rooms/1081802917899485789?adults=2&check_in=2027-01-04&check_out=2027-01-07&search_mode=regular_search&amenities%5B%5D=223&source_impression_id=p3_1786877891_P3Nm3DRcGWgziMs-&previous_page_section_name=1000&federated_search_id=7ad7d6d9-c5b5-4c4b-9a12-94e54931f4b3",
+     "geo": null
+    },
+    {
+     "rank": 8,
+     "source": "Airbnb",
+     "name": "Loft in an Art Studio, Bad Ischl | Salzkammergut",
+     "total": 579.0,
+     "notes": "more expensive, but the place is super nice and cozy and artsy",
+     "url": "https://www.airbnb.com/rooms/42680478?adults=1&check_in=2027-01-04&check_out=2027-01-07&search_mode=regular_search&source_impression_id=p3_1786836887_P3Zzo2a3zvUZHmxt&previous_page_section_name=1000&federated_search_id=04049cd9-5e7a-474a-9bd5-b39f8018c26c",
+     "geo": "Bad Ischl, Austria"
+    },
+    {
+     "rank": 9,
+     "source": "Airbnb",
+     "name": "Tiny house with sauna barrel",
+     "total": 428.0,
+     "notes": "literally, everything I want (remote, small, cozy, sauna). BUT it's a bit too far in the north and house too little",
+     "url": "https://www.airbnb.com/rooms/771764042263836716?adults=2&check_in=2027-01-04&check_out=2027-01-07&location=Austria&search_mode=regular_search&amenities%5B%5D=223&source_impression_id=p3_1786838756_P3teXIX80bI3GdVc&previous_page_section_name=1001&federated_search_id=d21ceec9-5b29-476f-9707-ca536cd94d39",
+     "geo": null
+    },
+    {
+     "rank": 10,
+     "source": "Airbnb",
+     "name": "Apartment Bergliebe Bad Goisern on Lake Hallstatt",
+     "total": 352.0,
+     "notes": "entire apartment, close to the lake, in between mountain, with balcony",
+     "url": "https://www.airbnb.com/rooms/1421170039709911718?adults=1&check_in=2027-01-04&check_out=2027-01-07&search_mode=regular_search&source_impression_id=p3_1786836887_P3kKtslTmUTmOax5&previous_page_section_name=1000&federated_search_id=04049cd9-5e7a-474a-9bd5-b39f8018c26c",
+     "geo": "Bad Goisern am Hallstättersee, Austria"
+    },
+    {
+     "rank": 11,
+     "source": "Airbnb",
+     "name": "GMA: Studio Apartment | Center | Kitchen | AC",
+     "total": 446.0,
+     "notes": "Apartment in a nice town in the mountains. Modern apartment. Close to restaurants",
+     "url": "https://www.airbnb.com/rooms/1657120311673586190?adults=1&check_in=2027-01-04&check_out=2027-01-07&search_mode=regular_search&source_impression_id=p3_1786836887_P3prQiSTfbbjL_Wh&previous_page_section_name=1000&federated_search_id=04049cd9-5e7a-474a-9bd5-b39f8018c26c",
+     "geo": null
+    }
+   ]
+  }
+ ],
+ "travel": [
+  {
+   "leg": "AMS -> VIE",
+   "mode": "flight",
+   "carrier": "Austrian Airline",
+   "date": "Dec 29",
+   "times": "10:00 -> 11:50 OR 07:05 -> 08:55",
+   "cost2": 367.0,
+   "note": "Total included 1 carry one and seat selection"
+  },
+  {
+   "leg": "Wien Hbf -> Innsbruck Hbf",
+   "mode": "train",
+   "carrier": "OeBB Railjet, direct. Sparschiene - book early",
+   "date": "Jan 1",
+   "times": "12:28 - 17:04 (4h36)",
+   "cost2": 172.6,
+   "note": "price includes seat selection in second class"
+  },
+  {
+   "leg": "Innsbruck Hbf -> Salzburg Hbf",
+   "mode": "train",
+   "carrier": "OeBB Railjet, direct. Sit on the RIGHT",
+   "date": "Jan 3",
+   "times": "10:56 - 13:02 OR 12:56 - 15:02 (2h06)",
+   "cost2": 55.0,
+   "note": "price varies depending on the travel hours. can consider both first and second class. seat included"
+  },
+  {
+   "leg": "Rental car (Sixt, Salzburg Airport)",
+   "mode": "car",
+   "carrier": "3 days, ~EUR 230 total for the car = EUR 115pp",
+   "date": "Jan 4 - Jan 7",
+   "times": "Pickup 13:30 / return 09:45",
+   "cost2": 370.0,
+   "note": "from booking, with chain included - skoda fabia manual"
+  },
+  {
+   "leg": "SZG -> AMS",
+   "mode": "flight",
+   "carrier": null,
+   "date": "Jan 7",
+   "times": null,
+   "cost2": 226.0,
+   "note": null
+  }
+ ],
+ "days": [
+  {
+   "d": 1,
+   "date": "Dec 29",
+   "title": "Vienna - arrival",
+   "details": "Land VIE ~11:00. S-Bahn S7 to Wien Mitte (25 min, EUR 4.30pp - better value than the CAT). Buy 72h Wiener Linien pass (~EUR 17.10pp). Stephansdom and the Innere Stadt on foot. Coffee at Cafe Sperl or Hawelka. Dinner at a traditional Beisl. Keep it light - you'll be tired."
+  },
+  {
+   "d": 2,
+   "date": "Dec 30",
+   "title": "Vienna - big sightseeing day",
+   "details": "08:30 Schoenbrunn Palace, go early (Grand Tour ~EUR 32pp), walk the Gloriette hill. 13:30 pick ONE: Belvedere for Klimt (~EUR 17pp) or Kunsthistorisches for Bruegel (~EUR 21pp). 16:30 Naschmarkt or Museumsquartier. Dinner - schnitzel."
+  },
+  {
+   "d": 3,
+   "date": "Dec 31",
+   "title": "Vienna - New Year's Eve",
+   "details": "Slow morning, Hofburg. Eat properly before evening - restaurants get impossible. 17:00 SILVESTERPFAD begins, free trail across the old town (Rathausplatz, Am Hof, Graben, Prater). Midnight: Pummerin bell, fireworks, Danube Waltz in the street. U-Bahn runs ALL NIGHT."
+  },
+  {
+   "d": 4,
+   "date": "Jan 1",
+   "title": "Travel day -> Innsbruck",
+   "details": "Optional 11:15 free live screening of the New Year's Concert on Rathausplatz. 13:30 depart Wien Hbf -> 17:55 arrive Innsbruck (OeBB Railjet, direct, ~4h25). WARNING: reduced holiday timetable on 1 Jan - confirm times when booking. Dinner in the Altstadt, early night."
+  },
+  {
+   "d": 5,
+   "date": "Jan 2",
+   "title": "Innsbruck - full alpine day",
+   "details": "08:30 Nordkettenbahnen: city centre to 2,000m in ~20 min (~EUR 44pp return). Go on the first cars. 12:30 Altstadt: Golden Roof, Maria-Theresien-Strasse, Hofkirche. Optional Ambras Castle. Second night in the same bed - no packing."
+  },
+  {
+   "d": 6,
+   "date": "Jan 3",
+   "title": "Travel day -> Salzburg",
+   "details": "10:00 depart Innsbruck -> 11:57 arrive Salzburg (~2h). SIT ON THE RIGHT - most scenic rail stretch of the trip. 13:30 Altstadt: Getreidegasse, Mozart's Birthplace, Cathedral. 15:00 Hohensalzburg Fortress (~EUR 16pp incl. funicular) before the light dies. 17:00 Mirabell Gardens. Dinner at Augustiner Braeustuebl."
+  },
+  {
+   "d": 7,
+   "date": "Jan 4",
+   "title": "Salzburg -> the cabin (car pickup)",
+   "details": "09:30 DomQuartier or a Salzach walk. 12:45 Bus 10 to Salzburg Airport (20 min, EUR 2.60pp). 13:30 COLLECT SIXT RENTAL CAR. 14:15 supermarket stop en route (SPAR/Billa in Golling or Hallein) - you'll want to cook at the cabin. 15:00 drive to cabin (~1h Abtenau / ~1h15 Gosau). Light the sauna."
+  },
+  {
+   "d": 8,
+   "date": "Jan 5",
+   "title": "Cabin - Hallstatt day trip",
+   "details": "09:00 drive to Hallstatt (~25 min from Gosau). Park P1/P2 (~EUR 8-12/day), village core is car-free. Marktplatz, Seestrasse viewpoint, lakeside. 11:00 Beinhaus bone house (~EUR 2pp) - genuinely unusual. 13:30 drive to Vorderer Gosausee, frozen lake under the Dachstein glacier, easy ~1h loop - best landscape of the trip. Home before dark."
+  },
+  {
+   "d": 9,
+   "date": "Jan 6",
+   "title": "Cabin - ski / sled (Epiphany)",
+   "details": "09:15 drive to Dachstein West (Gosau Hornspitz, ~5-10 min). Gear ~EUR 30-35pp/day, beginner pass ~EUR 40-50pp. Genuinely good for first-timers - wide, gentle, uncrowded. ALTERNATIVE: rent a toboggan (~EUR 10-15). 14:30 winter hiking on marked Winterwanderwege. Final sauna. PACK TONIGHT."
+  },
+  {
+   "d": 10,
+   "date": "Jan 7",
+   "title": "Departure",
+   "details": "07:30 breakfast, check the cabin. 08:30 drive to Salzburg Airport (~1h Abtenau / ~1h15 Gosau). 09:45 return the Sixt car. Salzburg is small - 2h before departure is plenty. Adjust to your actual flight: departure minus 2h30."
+  }
+ ],
+ "notincluded": "NOT included in the total above (estimates for 2 people, for reference): Vienna 72h transport passes EUR 35  |  Fuel + parking EUR 60-80  |  Nordkette cable car EUR 88  |  Schoenbrunn + one museum EUR 98  |  Hohensalzburg Fortress EUR 32  |  Ski gear + lift pass, 1 day EUR 140-170  |  Hallstatt parking + Beinhaus EUR 16  |  Food & drink ~EUR 60/day x 10 days = EUR 600.  Activities + food subtotal roughly EUR 1,070-1,120.",
+ "warnings": [
+  "CHECK FIRST: confirm your outbound flight on 7 Jan actually departs from SALZBURG (SZG). It's a small airport with limited winter routes - if your carrier only flies from Vienna, the back half of this itinerary needs rethinking.",
+  "DAYLIGHT is the single biggest constraint: sunrise ~07:45, sunset ~16:30. Every outdoor plan needs to finish by 16:00.",
+  "PUBLIC HOLIDAYS: 1 Jan and 6 Jan (Epiphany) - shops shut, reduced transport, many museums closed. Both are already built in as travel/rest days.",
+  "CAR: winter tyres are legally required in wintry conditions (1 Nov - 15 Apr) - confirm at pickup. Also check vignette, snow chains, and fuel policy. Roughly 300-350 km total driving.",
+  "WINTER CLOSURES: Hallstatt's salt mine and Skywalk funicular typically close for maintenance in January. The village itself is the draw.",
+  "BOOKING PRIORITY: 1) Vienna 29-31 Dec (tightest window of the year)  2) Cabin 4-7 Jan (saunas are scarce, many enforce 7-night minimums)  3) OeBB Sparschiene fares (rise sharply)  4) Innsbruck + Salzburg (flexible)  5) Sixt car (prices stable, book last).",
+  "CASH: mountain huts, small cabins and village shops are often cash-only. Carry EUR 100-150 for the cabin section."
+ ]
+};
+
 const DATA = [
 {
-  id:'austria', icon:'🏔️', name:'Austria', subtitle:'Salzburg → Vienna',
-  countries:'Austria', dates:'Dec 28 – Jan 4 · 8 days', tags:['snow','nye'],
+  id:'austria', icon:'🏔️', name:'Austria (Grand Tour)', subtitle:'Vienna → Innsbruck → Salzburg → Mountain cabin',
+  countries:'Austria', dates:'Dec 29 – Jan 7 · 10 days, 9 nights', tags:['snow','nye'],
+  isGrandTour:true,
+  gt: AUSTRIA_GT,
   route:[
-    {code:'AMS', name:'Amsterdam', lat:52.3676, lng:4.9041, mode:null, blurb:'Departure'},
-    {code:'SZG', name:'Salzburg', lat:47.8002, lng:13.0455, mode:'✈ flight', tag:'snow', blurb:'3 nights · Altstadt base'},
-    {code:'VIE', name:'Vienna', lat:48.2087, lng:16.3738, mode:'🚆 train · 2h25', tag:'nye', blurb:'4 nights · NYE here'}
+    {code:'VIE', name:'Vienna', lat:48.2087, lng:16.3738, mode:null, tag:'nye', blurb:'3 nights · New Year\'s Eve here'},
+    {code:'INN', name:'Innsbruck', lat:47.2692, lng:11.4041, mode:'🚆 train · 4h36', tag:'snow', blurb:'2 nights · Nordkette, Alps'},
+    {code:'SZG', name:'Salzburg', lat:47.8095, lng:13.0550, mode:'🚆 train · 2h06', blurb:'1 night · Altstadt, fortress'},
+    {code:'GOS', name:'Cabin (Gosau area)', lat:47.5847, lng:13.5372, mode:'🚗 rental car · ~1h', tag:'snow', blurb:'3 nights · ski, sauna, Hallstatt'}
   ],
-  daytrips:[{code:'HAL', name:'Hallstatt', lat:47.5622, lng:13.6493, from:'SZG', tag:'snow', blurb:'Day trip from Salzburg'}],
-  days:[
-    {d:1,date:'Dec 28',title:'Arrive Salzburg',desc:'Fly AMS → Salzburg. Settle into the Altstadt.',tags:[]},
-    {d:2,date:'Dec 29',title:'Salzburg old town / Zell am See day trip',desc:'Mirabell Gardens, the Dom, Getreidegasse.',tags:['snow']},
-    {d:3,date:'Dec 30',title:'Hallstatt',desc:'1h15 to Austria\'s snowiest lake village.',tags:['snow']},
-    {d:4,date:'Dec 31',title:'Fortress, then Vienna, then NYE',desc:'Hohensalzburg in the morning, train to Vienna, then Silvesterpfad — official fireworks.',tags:['nye']},
-    {d:5,date:'Jan 1',title:'Recover',desc:'Free New Year\'s Concert broadcast at Stephansplatz.',tags:[]},
-    {d:6,date:'Jan 2',title:'Schönbrunn',desc:'Full day at the palace and gardens.',tags:[]},
-    {d:7,date:'Jan 3',title:'Free day',desc:'Belvedere, Naschmarkt, or the Ringstrasse.',tags:[]},
-    {d:8,date:'Jan 4',title:'Fly home',desc:'Vienna → Amsterdam.',tags:[]}
+  daytrips:[
+    {code:'HAL', name:'Hallstatt', lat:47.5622, lng:13.6493, from:'GOS', tag:'snow', blurb:'Day trip from the cabin'},
+    {code:'GSE', name:'Gosausee', lat:47.5386, lng:13.4906, from:'GOS', tag:'snow', blurb:'Frozen lake under the Dachstein'}
   ],
-  hotels:[
-    {city:'Salzburg', name:'DAD Vogelweiderhof Rooms', source:'Booking.com', area:'Schallmoos district', checkin:'Dec 28', checkout:'Dec 31', nights:3, total:401, url:'https://www.booking.com/hotel/at/dad-vogelweiderhof-rooms.en-gb.html?aid=2311236&checkin=2026-12-28&checkout=2026-12-31&group_adults=2&no_rooms=1',
-      personalNote:null, extraNote:'Schallmoos district — a working residential area ~20–25 min walk (or one bus, line 21) from the Altstadt, close to the main train station.'},
-    {city:'Vienna', name:'Licht en modern stadsappartement TG10', source:'Airbnb', area:'Vienna', checkin:'Dec 31', checkout:'Jan 4', nights:4, total:418, url:'https://www.airbnb.nl/rooms/1119615189609600227?adults=2&check_in=2026-12-31&check_out=2027-01-04',
-      personalNote:'also really cool', extraNote:null}
-  ],
-  flight:{
-    legs:[
-      {route:'AMS → SZG', carrier:'transavia', date:'Dec 28', dep:'14:20', arr:'15:55'},
-      {route:'VIE → AMS', carrier:'Austrian Airlines', date:'Jan 4', dep:'17:20', arr:'19:15'}
-    ], costPerPerson:229, altNote:null
-  },
-  price:{accom:819},
-  note:'Single country keeps transport simple — one flight in, one train, one flight out.'
+  note:'Flights to Vienna and home from Salzburg aren\'t drawn on the map — this page shows the Austrian leg only. All accommodation, pricing and notes come straight from your Grand Tour sheet.'
 },
 {
   id:'finland', icon:'❄️', name:'Finland', subtitle:'Helsinki → Turku',
@@ -639,6 +1093,9 @@ function renderSidebar(){
       const t = it.windows.map(windowTotals);
       const lo = Math.min(...t.map(x=>x.pp)), hi = Math.max(...t.map(x=>x.pp));
       priceLabel = lo===hi ? fmt(lo) : `${fmt(lo)}–${fmt(hi)}`;
+    } else if(it.isGrandTour){
+      gtInitState(it);
+      priceLabel = fmt(Math.round((gtTravelTotal(it) + gtAccomTotal(it))/2));
     } else if(it.hasLocationMap){
       const accomTotal = it.accommodations.filter(a=>a.selected).reduce((s,a)=>s+a.total,0);
       priceLabel = fmt(Math.round((it.flight.costPerPerson*2 + accomTotal)/2));
@@ -990,9 +1447,333 @@ function renderComboMapPage(it){
   </div>`;
 }
 
+/* ===================== Austria Grand Tour: state, storage, rendering ===================== */
+
+const gtChoice = {};        // stayIndex -> optionIndex (chosen accommodation)
+const gtCoords = {};        // "stayIdx-optIdx" -> {lat,lng}  (geocoded or manually entered)
+const gtMarkers = {};       // "stayIdx-optIdx" -> Leaflet marker
+
+function gtStoreGet(key, fallback){
+  try{ const v = window.localStorage.getItem(key); return v===null ? fallback : JSON.parse(v); }
+  catch(e){ return fallback; }
+}
+function gtStoreSet(key, val){
+  try{ window.localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+}
+
+function gtInitState(it){
+  const saved = gtStoreGet('gt-choice', null);
+  it.gt.stays.forEach((s,si)=>{
+    gtChoice[si] = (saved && saved[si] !== undefined) ? saved[si] : 0; // default: your rank-1 pick
+  });
+  Object.assign(gtCoords, gtStoreGet('gt-coords', {}));
+}
+
+function gtTravelTotal(it){
+  return it.gt.travel.reduce((s,t)=>s+t.cost2, 0);
+}
+function gtAccomTotal(it){
+  let sum = 0;
+  it.gt.stays.forEach((s,si)=>{
+    const oi = gtChoice[si];
+    if(oi !== null && oi !== undefined && s.options[oi]) sum += s.options[oi].total;
+  });
+  return sum;
+}
+
+function gtSelect(itId, si, oi){
+  gtChoice[si] = oi;
+  gtStoreSet('gt-choice', gtChoice);
+  const it = DATA.find(x=>x.id===itId);
+  // repaint the option rows for this stay
+  document.querySelectorAll(`[data-stay="${si}"]`).forEach(el=>{
+    el.classList.toggle('chosen', parseInt(el.dataset.opt,10) === oi);
+  });
+  gtRefreshTotals(it);
+  gtRefreshMarkerStyles(it);
+}
+
+function gtRefreshTotals(it){
+  const travel = gtTravelTotal(it);
+  const accom = gtAccomTotal(it);
+  const total = travel + accom;
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = fmt(val); };
+  set('gt-travel-total', travel);
+  set('gt-accom-total', accom);
+  set('gt-grand-total', total);
+  set('gt-pp', Math.round(total/2));
+  const hero = document.getElementById('gt-hero-pp');
+  if(hero) hero.textContent = fmt(Math.round(total/2));
+}
+
+/* ---------- geocoding ---------- */
+
+function gtKey(si, oi){ return si + '-' + oi; }
+
+async function gtGeocodeAll(it, map){
+  const statusEl = document.getElementById('geo-status-'+it.id);
+  let placed = 0, needManual = 0, total = 0;
+  it.gt.stays.forEach(s=>{ total += s.options.length; });
+
+  for(let si=0; si<it.gt.stays.length; si++){
+    const stay = it.gt.stays[si];
+    for(let oi=0; oi<stay.options.length; oi++){
+      const opt = stay.options[oi];
+      const key = gtKey(si, oi);
+
+      if(gtCoords[key]){ gtPlaceMarker(it, map, si, oi, gtCoords[key]); placed++; continue; }
+
+      // only attempt lookup when we have a usable hint (a real place, not an Airbnb nickname)
+      if(opt.geo){
+        const loc = await geocodeAddress(opt.geo);
+        if(loc){
+          gtCoords[key] = loc; gtStoreSet('gt-coords', gtCoords);
+          gtPlaceMarker(it, map, si, oi, loc); placed++;
+        } else { needManual++; }
+        await new Promise(r=>setTimeout(r, 1100));
+      } else {
+        needManual++;
+      }
+      if(statusEl) statusEl.innerHTML = `<span class="geo-dot"></span> Locating pins… ${placed} placed`;
+    }
+  }
+  gtMarkPending(it);
+  if(statusEl){
+    statusEl.innerHTML = needManual
+      ? `<span class="geo-dot done"></span> ${placed} of ${total} pins placed — ${needManual} need coordinates (use “Add pin” on those options)`
+      : `<span class="geo-dot done"></span> All ${placed} accommodation pins placed`;
+  }
+}
+
+function gtPlaceMarker(it, map, si, oi, loc){
+  const key = gtKey(si, oi);
+  if(gtMarkers[key]){ map.removeLayer(gtMarkers[key]); }
+  const stay = it.gt.stays[si];
+  const opt = stay.options[oi];
+  const isChosen = gtChoice[si] === oi;
+  const marker = L.circleMarker([loc.lat, loc.lng], {
+    radius: isChosen ? 8 : 6,
+    color: isChosen ? '#0f7a3d' : '#9b9a97',
+    weight: 2,
+    fillColor: isChosen ? '#ddf3e4' : '#ffffff',
+    fillOpacity: 1
+  }).addTo(map);
+  marker.bindPopup(
+    `<b>#${opt.rank} · ${opt.name}</b><br>${stay.city} · ${opt.source} · ${fmt(opt.total)}` +
+    (opt.notes ? `<br><i>"${opt.notes}"</i>` : '') +
+    `<br><span class="popup-locate-link" onclick="gtScrollTo('${it.id}',${si},${oi})">View details ↓</span>`
+  );
+  gtMarkers[key] = marker;
+  return marker;
+}
+
+function gtRefreshMarkerStyles(it){
+  it.gt.stays.forEach((stay,si)=>{
+    stay.options.forEach((opt,oi)=>{
+      const m = gtMarkers[gtKey(si,oi)];
+      if(!m) return;
+      const isChosen = gtChoice[si] === oi;
+      m.setStyle({
+        radius: isChosen ? 8 : 6,
+        color: isChosen ? '#0f7a3d' : '#9b9a97',
+        fillColor: isChosen ? '#ddf3e4' : '#ffffff'
+      });
+    });
+  });
+}
+
+function gtMarkPending(it){
+  it.gt.stays.forEach((stay,si)=>{
+    stay.options.forEach((opt,oi)=>{
+      const btn = document.getElementById(`gtpin-${si}-${oi}`);
+      if(!btn) return;
+      if(gtCoords[gtKey(si,oi)]){
+        btn.className = 'gt-btn';
+        btn.innerHTML = '📍 Locate';
+      } else {
+        btn.className = 'gt-btn warn';
+        btn.innerHTML = '📍 Add pin';
+      }
+    });
+  });
+}
+
+/* ---------- locate / manual coordinates ---------- */
+
+async function gtLocate(itId, si, oi){
+  const it = DATA.find(x=>x.id===itId);
+  const map = mapInstances[itId];
+  const key = gtKey(si, oi);
+
+  document.querySelectorAll('.gt-opt').forEach(el=>el.classList.remove('highlight'));
+  const row = document.getElementById(`gtopt-${si}-${oi}`);
+  if(row) row.classList.add('highlight');
+
+  if(!gtCoords[key]){ gtAskCoords(itId, si, oi); return; }
+
+  const mapEl = document.getElementById('map-'+itId);
+  if(mapEl) mapEl.scrollIntoView({behavior:'smooth', block:'center'});
+  let marker = gtMarkers[key] || gtPlaceMarker(it, map, si, oi, gtCoords[key]);
+  setTimeout(()=>{
+    map.invalidateSize();
+    map.setView(marker.getLatLng(), 13, {animate:true});
+    setTimeout(()=>marker.openPopup(), 400);
+  }, 450);
+}
+
+function gtAskCoords(itId, si, oi){
+  const it = DATA.find(x=>x.id===itId);
+  const opt = it.gt.stays[si].options[oi];
+  const key = gtKey(si, oi);
+  const existing = gtCoords[key] ? `${gtCoords[key].lat}, ${gtCoords[key].lng}` : '';
+  const input = window.prompt(
+    `Coordinates for:\n${opt.name}\n(${it.gt.stays[si].city})\n\n` +
+    `Open the listing, right-click the map spot in Google Maps and pick the lat/lng, then paste it here as:  47.5847, 13.5372\n\n` +
+    `Leave empty and press OK to remove this pin.`,
+    existing
+  );
+  if(input === null) return;                     // cancelled
+  const trimmed = input.trim();
+  if(trimmed === ''){                            // clear
+    delete gtCoords[key];
+    gtStoreSet('gt-coords', gtCoords);
+    const map = mapInstances[itId];
+    if(gtMarkers[key] && map){ map.removeLayer(gtMarkers[key]); delete gtMarkers[key]; }
+    gtMarkPending(it);
+    return;
+  }
+  const m = trimmed.match(/^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/);
+  if(!m){ window.alert('Could not read that. Use the format:  47.5847, 13.5372'); return; }
+  const lat = parseFloat(m[1]), lng = parseFloat(m[2]);
+  if(lat < -90 || lat > 90 || lng < -180 || lng > 180){ window.alert('Those numbers are out of range for latitude/longitude.'); return; }
+  gtCoords[key] = {lat, lng};
+  gtStoreSet('gt-coords', gtCoords);
+  gtPlaceMarker(it, mapInstances[itId], si, oi, gtCoords[key]);
+  gtMarkPending(it);
+  gtLocate(itId, si, oi);
+}
+
+function gtScrollTo(itId, si, oi){
+  const row = document.getElementById(`gtopt-${si}-${oi}`);
+  if(row){
+    row.scrollIntoView({behavior:'smooth', block:'center'});
+    document.querySelectorAll('.gt-opt').forEach(el=>el.classList.remove('highlight'));
+    row.classList.add('highlight');
+    setTimeout(()=>row.classList.remove('highlight'), 2600);
+  }
+}
+
+/* ---------- page ---------- */
+
+function renderGrandTourPage(it){
+  gtInitState(it);
+  const travel = gtTravelTotal(it);
+  const accom = gtAccomTotal(it);
+  const total = travel + accom;
+  const modeIcon = m => m==='train' ? '🚆' : (m==='car' ? '🚗' : '✈️');
+
+  return `<div class="page-inner">
+    <div class="page-icon">${it.icon}</div>
+    <h1>${it.name}</h1>
+    <div class="page-sub">${it.subtitle}</div>
+
+    <div class="props">
+      <div class="prow"><div class="plabel">📍 Countries</div><div class="pvalue">${it.countries}</div></div>
+      <div class="prow"><div class="plabel">📅 Dates</div><div class="pvalue">${it.dates}</div></div>
+      <div class="prow"><div class="plabel">✈️ Departure</div><div class="pvalue">Amsterdam (AMS) → Vienna · home from Salzburg (SZG)</div></div>
+      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong"><span id="gt-hero-pp">${fmt(Math.round(total/2))}</span></div></div>
+    </div>
+    <div class="pills">${it.tags.map(t=>`<span class="pill ${t}">${tagLabel[t]}</span>`).join('')}</div>
+
+    <hr class="div">
+    <h2 class="sec">🗺️ The route in Austria</h2>
+    <div class="geo-status" id="geo-status-${it.id}"><span class="geo-dot"></span> Locating accommodation pins…</div>
+    <div class="mapbox" id="map-${it.id}"></div>
+    <div class="map-cap">Vienna → Innsbruck → Salzburg → the cabin, plus day trips. Flights in and out aren't drawn. Click any pin for details; "Locate" on an option below flies the map to it.</div>
+
+    <h2 class="sec">📅 Day by day</h2>
+    ${it.gt.days.map(d=>`
+      <details class="day" open>
+        <summary>
+          <span class="day-badge">${String(d.d).padStart(2,'0')}</span>
+          <span class="day-date">${d.date}</span>
+          <span class="day-title">${d.title}</span>
+        </summary>
+        <div class="day-content">${d.details}</div>
+      </details>
+    `).join('')}
+
+    <hr class="div">
+    <h2 class="sec">🏨 Accommodation — pick one per stop</h2>
+    <div class="callout" style="margin-bottom:16px;">Listed in your preference order from the sheet (#1 = most preferred). Tap any option to select it — the totals below update instantly, and your choice is remembered on this device.</div>
+
+    ${it.gt.stays.map((s,si)=>`
+      <div class="gt-stay">
+        <div class="gt-stay-head">
+          <span class="gt-stay-city">${s.city}</span>
+          <span class="gt-stay-dates">${s.label}</span>
+          <span class="gt-stay-count">${s.options.length} options</span>
+        </div>
+        ${s.options.map((o,oi)=>`
+          <div class="gt-opt${gtChoice[si]===oi?' chosen':''}" id="gtopt-${si}-${oi}"
+               data-stay="${si}" data-opt="${oi}" onclick="gtSelect('${it.id}',${si},${oi})">
+            <div class="gt-radio"></div>
+            <div class="gt-rank">${o.rank}</div>
+            <div class="gt-body">
+              <div class="gt-line1">
+                <span class="pill src" style="padding:2px 8px;font-size:10px;">${o.source}</span>
+                <span class="gt-name">${o.name}</span>
+              </div>
+              ${o.notes ? `<div class="gt-note">"${o.notes}"</div>` : ''}
+              <div class="gt-actions" onclick="event.stopPropagation()">
+                <button class="gt-btn" id="gtpin-${si}-${oi}" onclick="gtLocate('${it.id}',${si},${oi})">📍 Locate</button>
+                <a class="gt-btn" href="${o.url}" target="_blank" rel="noopener">Open listing ↗</a>
+                <button class="gt-btn" onclick="gtAskCoords('${it.id}',${si},${oi})">✎ Coords</button>
+              </div>
+            </div>
+            <div class="gt-price">${fmt(o.total)}</div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('')}
+
+    <hr class="div">
+    <h2 class="sec">🚆 Getting there & around</h2>
+    ${it.gt.travel.map(t=>`
+      <div class="gt-leg">
+        <div class="gt-leg-icon">${modeIcon(t.mode)}</div>
+        <div class="gt-leg-body">
+          <div class="gt-leg-route">${t.leg}</div>
+          <div class="gt-leg-meta">
+            ${t.carrier ? t.carrier + ' · ' : ''}${t.date || ''}${t.times ? ' · ' + t.times : ''}
+          </div>
+          ${t.note ? `<div class="gt-leg-note">${t.note}</div>` : ''}
+        </div>
+        <div class="gt-leg-cost">${fmt(t.cost2)}</div>
+      </div>
+    `).join('')}
+    <div class="callout">All travel prices above are the <b>total for 2 people</b>, straight from your sheet.</div>
+
+    <hr class="div">
+    <h2 class="sec">💰 The numbers — travel + accommodation</h2>
+    <div class="gt-total-card">
+      <div class="gt-total-row"><span>Travel, 2 travelers (5 legs)</span><span class="v" id="gt-travel-total">${fmt(travel)}</span></div>
+      <div class="gt-total-row"><span>Accommodation, your selections</span><span class="v" id="gt-accom-total">${fmt(accom)}</span></div>
+      <div class="gt-total-row sum"><span>Total, 2 travelers</span><span class="v" id="gt-grand-total">${fmt(total)}</span></div>
+    </div>
+    <div class="total-callout">
+      <span class="label">Per person</span>
+      <span class="val" id="gt-pp">${fmt(Math.round(total/2))}</span>
+    </div>
+    <div class="callout">${it.gt.notincluded}</div>
+    ${it.gt.warnings.map(w=>`<div class="callout" style="border-left:3px solid #e8c98a;">⚠️ ${w}</div>`).join('')}
+    <div class="callout">${it.note}</div>
+  </div>`;
+}
+
 function renderMain(){
   document.getElementById('main').innerHTML = DATA.map((it,i)=>
-    `<div class="page${i===0?' active':''}" id="page-${it.id}">${it.hasLocationMap ? renderComboMapPage(it) : (it.isWindowPair ? renderWindowPage(it) : renderPage(it))}</div>`
+    `<div class="page${i===0?' active':''}" id="page-${it.id}">${it.isGrandTour ? renderGrandTourPage(it) : (it.hasLocationMap ? renderComboMapPage(it) : (it.isWindowPair ? renderWindowPage(it) : renderPage(it)))}</div>`
   ).join('');
 }
 
@@ -1032,6 +1813,9 @@ function initMap(it){
 
   if(it.hasLocationMap && it.accommodations){
     geocodeAccommodations(it, map);
+  }
+  if(it.isGrandTour){
+    gtGeocodeAll(it, map);
   }
 }
 
