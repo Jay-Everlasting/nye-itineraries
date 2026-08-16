@@ -131,11 +131,36 @@
   .callout.flag{background:var(--red-bg); color:var(--red-text); font-weight:600; margin:0 0 20px;}
 
   /* ---------- tablet / small laptop ---------- */
+  .money{white-space:nowrap;}
+
+  /* currency toggle */
+  .cur-toggle{
+    display:inline-flex; gap:2px; padding:2px; margin:0 10px 12px;
+    background:var(--bg-hover); border:1px solid var(--border); border-radius:9px;
+  }
+  .cur-btn{
+    border:none; background:transparent; font-family:inherit; font-size:11.5px; font-weight:600;
+    color:var(--text-muted); padding:6px 13px; border-radius:7px; cursor:pointer; min-height:32px;
+    letter-spacing:.02em; transition:background .13s, color .13s;
+  }
+  .cur-btn:hover:not(.on){color:var(--text);}
+  .cur-btn.on{background:#fff; color:var(--text); box-shadow:0 1px 2px rgba(16,24,40,.10);}
+
   @media (max-width:820px){
     body{flex-direction:column;}
-    .sidebar{width:100%; height:auto; position:static; display:flex; overflow-x:auto; padding:10px; gap:2px;}
+    .sidebar{
+      width:100%; height:auto; display:flex; align-items:center; gap:8px; padding:8px 10px;
+      position:sticky; top:0; z-index:60; overflow:visible;
+      background:rgba(251,251,250,.97); backdrop-filter:blur(8px);
+    }
     .side-title, .side-foot{display:none;}
-    .side-item{flex-shrink:0;}
+    /* nav scrolls, currency toggle stays pinned to the right */
+    #side-list{order:1; flex:1 1 auto; min-width:0; display:flex; gap:3px; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+    #side-list::-webkit-scrollbar{height:0;}
+    .side-head{order:2; flex:0 0 auto; margin:0;}
+    .cur-toggle{margin:0;}
+    .cur-btn{padding:6px 10px; font-size:11px; min-height:34px;}
+    .side-item{flex-shrink:0; white-space:nowrap;}
     .page-inner{padding:32px 18px 70px;}
     .plabel{width:120px;}
   }
@@ -376,6 +401,8 @@
   }
 
   @media (max-width:400px){
+    .cur-btn{padding:6px 8px; font-size:10.5px;}
+    .sidebar{padding:7px 8px; gap:6px;}
     .gt-opt{padding:11px 10px; gap:7px;}
     .gt-rank{width:22px; height:22px; font-size:11px;}
     .gt-radio{width:18px; height:18px;}
@@ -397,7 +424,10 @@
 <body>
 
 <div class="sidebar">
-  <div class="side-title">NYE 2026 → 27 · From AMS</div>
+  <div class="side-head">
+    <div class="side-title">NYE 2026 → 27 · From AMS</div>
+    <div class="cur-toggle" id="cur-toggle" role="group" aria-label="Currency"></div>
+  </div>
   <div id="side-list"></div>
   <div class="side-foot">8 days · 2 travelers<br>Dec 28 – Jan 4</div>
 </div>
@@ -406,7 +436,46 @@
 
 <script>
 const tagLabel = {snow:'❄ Snow', nye:'🎆 NYE', warm:'☀ Warm', aurora:'🌌 Aurora'};
-function fmt(n){ return '€' + Math.round(n).toLocaleString('en-US'); }
+/* ---------------- currency ---------------- */
+const AUD_RATE = 1.63;
+let audRate = AUD_RATE;
+let CUR = { code:'EUR', symbol:'\u20ac', rate:1 };
+
+try{
+  const saved = window.localStorage.getItem('cur');
+  if(saved === 'AUD') CUR = { code:'AUD', symbol:'A$', rate:audRate };
+}catch(e){}
+
+function fmt(eur){
+  return CUR.symbol + Math.round(eur * CUR.rate).toLocaleString('en-US');
+}
+function money(eur){
+  return `<span class="money" data-eur="${eur}">${fmt(eur)}</span>`;
+}
+function repaintMoney(){
+  document.querySelectorAll('.money').forEach(el=>{
+    const e = parseFloat(el.dataset.eur);
+    if(!isNaN(e)) el.textContent = fmt(e);
+  });
+}
+function setCurrency(code){
+  CUR = (code === 'AUD') ? { code:'AUD', symbol:'A$', rate:audRate }
+                         : { code:'EUR', symbol:'\u20ac', rate:1 };
+  try{ window.localStorage.setItem('cur', code); }catch(e){}
+  document.querySelectorAll('.cur-btn').forEach(b=>{
+    const on = b.dataset.cur === code;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  repaintMoney();
+}
+function renderCurrencyToggle(){
+  const el = document.getElementById('cur-toggle');
+  if(!el) return;
+  el.innerHTML = ['EUR','AUD'].map(c=>
+    `<button class="cur-btn${CUR.code===c?' on':''}" data-cur="${c}" aria-pressed="${CUR.code===c}" onclick="setCurrency('${c}')">${c}</button>`
+  ).join('');
+}
 
 const AUSTRIA_GT = {
  "stays": [
@@ -790,6 +859,259 @@ const AUSTRIA_GT = {
  ]
 };
 
+const AUSTRIA_CT = {
+ "stays": [
+  {
+   "city": "Vienna",
+   "label": "Dec 29 - Jan 1 (3 nights)",
+   "options": [
+    {
+     "rank": 1,
+     "source": "Airbnb",
+     "name": "2 balcony apartment in top location",
+     "total": 447.0,
+     "notes": "nice apartment in great location for cafes and restaurants",
+     "url": "https://www.airbnb.com/rooms/1197156609865632935?adults=2&check_in=2026-12-29&check_out=2027-01-01&search_mode=regular_search&source_impression_id=p3_1786834848_P3oEsFmcZhq6oAld&previous_page_section_name=1000&federated_search_id=e805f598-91a2-40aa-bbcf-8",
+     "lat": 48.172546,
+     "lng": 16.373004
+    },
+    {
+     "rank": 2,
+     "source": "Airbnb",
+     "name": "Praterhood Elegant Suites",
+     "total": 420.0,
+     "notes": "super cute apartment, location is fine",
+     "url": "https://www.airbnb.com/rooms/1526995422925450176?adults=2&check_in=2026-12-29&check_out=2027-01-01&location=Vienna&search_mode=regular_search&source_impression_id=p3_1786833673_P3VQoE1Fhqz3N8PX&previous_page_section_name=1001&federated_search_id=9740ae8d-"
+    },
+    {
+     "rank": 3,
+     "source": "Airbnb",
+     "name": "Modern city apartment for 4 | Prater Vienna",
+     "total": 494.0,
+     "notes": "super nice and cozy in great location",
+     "url": "https://www.airbnb.com/rooms/1402224651928738353?adults=2&check_in=2026-12-29&check_out=2027-01-01&location=Vienna&search_mode=regular_search&source_impression_id=p3_1786833613_P3d_CcUZVbcA3_mm&previous_page_section_name=1001&federated_search_id=f1ca6fb9-"
+    },
+    {
+     "rank": 4,
+     "source": "Airbnb",
+     "name": "Spacious calm plant filled home",
+     "total": 439.0,
+     "notes": "house full of plants and a roof terrace. Location is great for caffes",
+     "url": "https://www.airbnb.com/rooms/1217415626400095277?adults=2&check_in=2026-12-29&check_out=2027-01-01&search_mode=regular_search&source_impression_id=p3_1786834811_P3unYdrnkLaMh0-E&previous_page_section_name=1000&federated_search_id=5db34830-9033-4822-b784-9"
+    },
+    {
+     "rank": 5,
+     "source": "Booking.com",
+     "name": "Simm's Hotel - cityhotel next to Metro U3",
+     "total": 665.0,
+     "notes": "cool hotel close to metro. Best room can be 617 euros non refundable",
+     "url": "https://www.booking.com/hotel/at/simma-s.en-gb.html?label=de-at-booking-desktop-pOrc*3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&aid=2311236&ucfs=1&checkin=2026-12-29&checkout=2027-0"
+    },
+    {
+     "rank": 6,
+     "source": "Airbnb",
+     "name": "AC Apartment at Prater & Messe",
+     "total": 590.0,
+     "notes": "complete apartment in a splendid location",
+     "url": "https://www.airbnb.com/rooms/1744290195041234608?adults=2&check_in=2026-12-29&check_out=2027-01-01&location=Vienna&search_mode=regular_search&source_impression_id=p3_1786833610_P3HrgdyVLTHxZJ4w&previous_page_section_name=1001&federated_search_id=f1ca6fb9-"
+    },
+    {
+     "rank": 7,
+     "source": "Booking.com",
+     "name": "JUFA Hotel Wien City",
+     "total": 565.0,
+     "notes": "hotel looks fine, nice location, but there are not so many images about the room",
+     "url": "https://www.booking.com/hotel/at/jufa-wien.en-gb.html?label=de-at-booking-desktop-pOrc*3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&aid=2311236&ucfs=1&checkin=2026-12-29&checkout=2027"
+    },
+    {
+     "rank": 8,
+     "source": "Booking.com",
+     "name": "OLIVER pulse I Apartments with self check-in",
+     "total": 639.0,
+     "notes": "nice full apartment in good location and with balcony",
+     "url": "https://www.booking.com/hotel/at/oliver-pulse-apartments-with-self-check-in.en-gb.html?aid=2311236&label=de-at-booking-desktop-pOrc%2A3owr7zO_Y7GOIeOnAS652829000110%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp1000997%3Ali%3Adec%3Adm&sid="
+    }
+   ]
+  },
+  {
+   "city": "Mountain cabin",
+   "label": "Jan 1 - Jan 5 (4 nights) - Car Only",
+   "options": [
+    {
+     "rank": 1,
+     "source": "Airbnb",
+     "name": "Apartment with view / sauna / winter garden / pool",
+     "total": 449.0,
+     "notes": "entire house with great view, Very big, with sauna",
+     "url": "https://www.airbnb.com/rooms/46064154?adults=2&check_in=2027-01-01&check_out=2027-01-04&location=Salzkammergut%2C%20Austria&search_mode=regular_search&amenities%5B%5D=223&source_impression_id=p3_1786891596_P3285F156QoNzhLW&previous_page_section_name=1001&federated_search_id=8cea7dcd-c720-4951-a4c8-34465a8c6f61",
+     "lat": 47.68631,
+     "lng": 13.13604
+    },
+    {
+     "rank": 2,
+     "source": "Airbnb",
+     "name": "Wellness oasis in the countryside",
+     "total": 381.0,
+     "notes": "Cabin in the woods with sauna. Looks fine but not wow. A bit far from Hallstatt",
+     "url": "https://www.airbnb.com/rooms/36938694?adults=2&check_in=2027-01-01&check_out=2027-01-04&location=Austria&search_mode=regular_search&amenities%5B0%5D=223&source_impression_id=p3_1786838759_P3N6kSwHzXMZgIQn&previous_page_section_name=1001&federated_search_id=d21ceec9-5b29-476f-9707-ca536cd94d39&guests=1",
+     "lat": 47.890737,
+     "lng": 14.037545
+    },
+    {
+     "rank": 3,
+     "source": "Airbnb",
+     "name": "Kratgut: 44 m² apartment built in 2020",
+     "total": 469.0,
+     "notes": "Big apartment in great location. It has nice balcony (great for star nights)",
+     "url": "https://www.airbnb.com/rooms/43934604?adults=2&category_tag=Tag%3A5348&check_in=2027-01-01&check_out=2027-01-04&location=Alps&search_mode=regular_search&photo_id=2203095872&source_impression_id=p3_1786890901_P38EHW3lsbPAr6ja&previous_page_section_name=1001&federated_search_id=ece3d2da-9ece-44e5-be2f-2ceadf79bae1",
+     "lat": 47.738956,
+     "lng": 13.657246
+    },
+    {
+     "rank": 4,
+     "source": "Airbnb",
+     "name": "Apartment Dachstein, with chill zone on the balcony",
+     "total": 459.0,
+     "notes": "apartment in a chill village close to Hallstatt. Close to ski/hike places. With \"chill balcony\"",
+     "url": "https://www.airbnb.com/rooms/40506185?adults=2&check_in=2027-01-01&check_out=2027-01-04&location=Gosau%2C%20Austria&search_mode=regular_search&source_impression_id=p3_1786891685_P3o5jzkeT96VDTjt&previous_page_section_name=1001&federated_search_id=6fa67b02-559f-4af0-b518-e4952b5455e6",
+     "lat": 47.586949,
+     "lng": 13.542792
+    },
+    {
+     "rank": 5,
+     "source": "Booking.com",
+     "name": "Grafbauer",
+     "total": 402.0,
+     "notes": "studio with mountain view close to a nice lake",
+     "url": "https://www.booking.com/hotel/at/studio-in-einem-bauernhaus.en-gb.html?label=austrian-alps-X7jXmVB*6KnOSSSqCLlOegS538259717189%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-1327757802%3Alp1009991%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YcpDr58xwogAwj23ro4OSeg&sid=433b571a6cc33ce46b5c5199041a63ab&aid=377354&ucfs=1&checkin=2027-01-01&checkout=2027-01-04&dest_id=3761&dest_type=region&group_adults=2&no_rooms=1&group_children=0&sr_order=price&nflt=oos%3D1%3Bprice%3DEUR-min-180-1%3Breview_score%3D80%3Bclass%3D4&srpvid=635e66e604f105f6&srepoch=1786891253&all_sr_blocks=843697602_351227212_2_0_0&highlighted_blocks=843697602_351227212_2_0_0&matching_block_id=843697602_351227212_2_0_0&atlas_src=sr_iw_title",
+     "lat": 47.7354186,
+     "lng": 13.4674204
+    },
+    {
+     "rank": 5,
+     "source": "Airbnb",
+     "name": "Mountain Lake Suite",
+     "total": 516.0,
+     "notes": "Apartment with mountain view. Close to another lake (we can see one more pretty town). Aparently nice for hiking",
+     "url": "https://www.airbnb.com/rooms/969401162348002052?adults=1&check_in=2027-01-01&search_mode=regular_search&source_impression_id=p3_1786836887_P3gKRwjnOEZqWPxQ&previous_page_section_name=1000&federated_search_id=04049cd9-5e7a-474a-9bd5-b39f8018c26c&guests=1&check_out=2027-01-04",
+     "lat": 47.718172,
+     "lng": 13.483525
+    },
+    {
+     "rank": 6,
+     "source": "Airbnb",
+     "name": "Holiday cottage in Ebensee",
+     "total": 369.0,
+     "notes": "woden cabin heated with wood. super cute and close to activities",
+     "url": "https://www.airbnb.com/rooms/43129810?adults=2&category_tag=Tag%3A5348&check_in=2027-01-01&check_out=2027-01-04&location=Austria&search_mode=regular_search&photo_id=2193266474&source_impression_id=p3_1786892913_P3VD_IkYvYFl81am&previous_page_section_name=1001&federated_search_id=58f36fd1-2256-4455-87cd-b0041ee5d736",
+     "lat": 47.813463,
+     "lng": 13.758987
+    }
+   ]
+  }
+ ],
+ "defaultChoice": [
+  0,
+  0
+ ],
+ "travel": [
+  {
+   "leg": "AMS -> VIE",
+   "mode": "flight",
+   "carrier": "Austrian Airline",
+   "date": "Dec 29",
+   "times": "10:00 -> 11:50",
+   "cost2": 367.0,
+   "note": null
+  },
+  {
+   "leg": "Wien Hbf -> Salzburg Hbf",
+   "mode": "train",
+   "carrier": "OeBB Railjet, direct, 2h22, twice hourly",
+   "date": "Jan 1",
+   "times": "tbd",
+   "cost2": 60.0,
+   "note": "to be booked asap due less availability on the 1st "
+  },
+  {
+   "leg": "Rental car (Salzburg -> cabin -> SZG airport)",
+   "mode": "car",
+   "carrier": "4 days. Pick up in Salzburg city, drop at the airport",
+   "date": "Jan 1 - Jan 5",
+   "times": "18:30 (we can leave luggage in a locker in salzburg for 18 euros for the entire day until we pick up the car)",
+   "cost2": 365.0,
+   "note": "From sixt - Pegoet 208 with winter tiers and chains included + insurance"
+  },
+  {
+   "leg": "SZG -> AMS",
+   "mode": "flight",
+   "carrier": "transavia",
+   "date": "Jan 5",
+   "times": "21:30 -> 23:15",
+   "cost2": 230.0,
+   "note": "Late night flight, will we catch the last train 👀 ?"
+  }
+ ],
+ "days": [
+  {
+   "d": 1,
+   "date": "Dec 29",
+   "title": "Vienna - arrival",
+   "details": "Land VIE ~11:00. S-Bahn S7 to Wien Mitte (25 min, EUR 4.30pp). Buy 72h Wiener Linien pass (~EUR 17.10pp). Stephansdom and the Innere Stadt on foot. Coffee at Cafe Sperl or Hawelka. Dinner at a traditional Beisl. Keep it light."
+  },
+  {
+   "d": 2,
+   "date": "Dec 30",
+   "title": "Vienna - big sightseeing day",
+   "details": "08:30 Schoenbrunn Palace, go early (~EUR 32pp), walk the Gloriette hill. 13:30 pick ONE: Belvedere for Klimt (~EUR 17pp) or Kunsthistorisches for Bruegel (~EUR 21pp). 16:30 Naschmarkt or Museumsquartier."
+  },
+  {
+   "d": 3,
+   "date": "Dec 31",
+   "title": "Vienna - New Year's Eve",
+   "details": "Slow morning, Hofburg. Eat properly before evening - restaurants get impossible. 17:00 SILVESTERPFAD, free trail across the old town. Midnight: Pummerin bell, fireworks, Danube Waltz in the street. U-Bahn runs ALL NIGHT."
+  },
+  {
+   "d": 4,
+   "date": "Jan 1",
+   "title": "Vienna -> Salzburg -> the cabin",
+   "details": "Late breakfast, check out. Train Wien Hbf -> Salzburg Hbf (Railjet, direct, 2h22, twice hourly). NOTE: reduced holiday timetable on 1 Jan - confirm times. Collect the rental car in Salzburg, supermarket stop en route (SPAR/Billa in Golling or Hallein), then drive to the cabin (~1h - 1h15). Light the sauna."
+  },
+  {
+   "d": 5,
+   "date": "Jan 2",
+   "title": "Cabin - Hallstatt day trip",
+   "details": "09:00 drive to Hallstatt (~25 min from Gosau). Park P1/P2 (~EUR 8-12/day), village core is car-free. Marktplatz, Seestrasse viewpoint, lakeside. Beinhaus bone house (~EUR 2pp). Afternoon: Vorderer Gosausee, frozen lake under the Dachstein, easy ~1h loop. Home before dark."
+  },
+  {
+   "d": 6,
+   "date": "Jan 3",
+   "title": "Cabin - take it easy",
+   "details": "No driving if you don't feel like it. Marked Winterwanderwege around the valley - packed snow, well signed, just boots and layers. Sauna, cook in, read. This is the day the compact plan buys you."
+  },
+  {
+   "d": 7,
+   "date": "Jan 4",
+   "title": "Cabin - ski / sled or a second lake",
+   "details": "Option A: Dachstein West (Gosau Hornspitz) - gear ~EUR 30-35pp/day, beginner pass ~EUR 40-50pp, or rent a toboggan (~EUR 10-15). Option B: drive to Bad Ischl or Wolfgangsee for a lower-key day. Final sauna. PACK TONIGHT."
+  },
+  {
+   "d": 8,
+   "date": "Jan 5",
+   "title": "Departure",
+   "details": "Breakfast, check the cabin. Drive to Salzburg Airport (~1h - 1h15). Return the car. Salzburg is small - 2h before departure is plenty. Adjust to your actual flight: departure minus 2h30."
+  }
+ ],
+ "notincluded": "NOT included in the total above (estimates for 2 people): Vienna 72h transport passes EUR 35 | Fuel + parking EUR 50-70 | Schoenbrunn + one museum EUR 98 | Ski gear + lift pass, 1 day EUR 140-170 (optional) | Hallstatt parking + Beinhaus EUR 16 | Food & drink ~EUR 60/day x 8 days = EUR 480. Roughly EUR 820-870 all in.",
+ "warnings": [
+  "BIGGEST REMAINING LEVER: the car exists only to reach the cabin. A cabin in Bad Goisern sits on the Salzkammergut railway with Hallstatt two stops away (plus the lake ferry) - going car-free there would cut the largest single line on this sheet.",
+  "CABIN PRICING WARNING: Jan 1-5 spans the New Year tail, so per-night rates may run above the Jan 4-7 prices in the Grand Tour sheet. Many cabins also enforce minimum stays - check before assuming a 4-night booking is possible.",
+  "DAYLIGHT: sunrise ~07:45, sunset ~16:30. Every outdoor plan needs to finish by 16:00.",
+  "PUBLIC HOLIDAY: 1 Jan - shops shut, reduced train timetable. It is already the travel day here, which is the right use for it.",
+  "CAR: winter tyres legally required in wintry conditions (1 Nov - 15 Apr) - confirm at pickup. Also check vignette, snow chains and fuel policy."
+ ]
+};
+
 const DATA = [
 {
   id:'austria', icon:'🏔️', name:'Austria (Grand Tour)', subtitle:'Vienna → Innsbruck → Salzburg → Mountain cabin',
@@ -807,6 +1129,24 @@ const DATA = [
     {code:'GSE', name:'Gosausee', lat:47.5386, lng:13.4906, from:'GOS', tag:'snow', blurb:'Frozen lake under the Dachstein'}
   ],
   note:'Flights to Vienna and home from Salzburg aren\'t drawn on the map — this page shows the Austrian leg only. All accommodation, pricing and notes come straight from your Grand Tour sheet.'
+},
+{
+  id:'austria_ct', icon:'🎿', name:'Austria (Compact Tour)', subtitle:'Vienna → train to Salzburg → mountain cabin',
+  countries:'Austria', dates:'Dec 29 – Jan 5 · 8 days, 7 nights', tags:['snow','nye'],
+  departure:'Amsterdam (AMS) → Vienna · home from Salzburg (SZG)',
+  isGrandTour:true,
+  gt: AUSTRIA_CT,
+  route:[
+    {code:'VIE', name:'Vienna', lat:48.2087, lng:16.3738, mode:null, tag:'nye', blurb:'3 nights · New Year\'s Eve here'},
+    {code:'SZG', name:'Salzburg', lat:47.8095, lng:13.0550, mode:'🚆 train · 2h22', blurb:'Transit only — collect the car here'},
+    {code:'CAB', name:'Cabin (Salzkammergut)', lat:47.6863, lng:13.1360, mode:'🚗 rental car · ~1h', tag:'snow', blurb:'4 nights · sauna, Hallstatt, take it easy'}
+  ],
+  daytrips:[
+    {code:'HAL', name:'Hallstatt', lat:47.5622, lng:13.6493, from:'CAB', tag:'snow', blurb:'Day trip from the cabin'},
+    {code:'GSE', name:'Gosausee', lat:47.5386, lng:13.4906, from:'CAB', tag:'snow', blurb:'Frozen lake under the Dachstein'}
+  ],
+  mapCap:'Vienna → Salzburg → the cabin, plus day trips. Flights in and out aren\'t drawn. Green pins are your current picks; grey pins are the alternatives. Options without coordinates in the sheet don\'t appear — use “Add pin” to place them.',
+  note:'The cheaper shape: two bases instead of four, no Innsbruck and no Salzburg night. Nearly all the saving versus the Grand Tour comes from accommodation rather than transport.'
 },
 {
   id:'finland', icon:'❄️', name:'Finland', subtitle:'Helsinki → Turku',
@@ -1129,15 +1469,15 @@ function renderSidebar(){
     if(it.isWindowPair){
       const t = it.windows.map(windowTotals);
       const lo = Math.min(...t.map(x=>x.pp)), hi = Math.max(...t.map(x=>x.pp));
-      priceLabel = lo===hi ? fmt(lo) : `${fmt(lo)}–${fmt(hi)}`;
+      priceLabel = lo===hi ? money(lo) : `${money(lo)}–${money(hi)}`;
     } else if(it.isGrandTour){
       gtInitState(it);
-      priceLabel = fmt(Math.round((gtTravelTotal(it) + gtAccomTotal(it))/2));
+      priceLabel = money(Math.round((gtTravelTotal(it) + gtAccomTotal(it))/2));
     } else if(it.hasLocationMap){
       const accomTotal = it.accommodations.filter(a=>a.selected).reduce((s,a)=>s+a.total,0);
-      priceLabel = fmt(Math.round((it.flight.costPerPerson*2 + accomTotal)/2));
+      priceLabel = money(Math.round((it.flight.costPerPerson*2 + accomTotal)/2));
     } else {
-      priceLabel = fmt(Math.round((it.flight.costPerPerson*2 + it.price.accom)/2));
+      priceLabel = money(Math.round((it.flight.costPerPerson*2 + it.price.accom)/2));
     }
     return `<div class="side-item${i===0?' active':''}" data-id="${it.id}" onclick="selectPage('${it.id}')">
       <span class="side-icon">${it.icon}</span> ${it.name}
@@ -1161,7 +1501,7 @@ function renderPage(it){
       <div class="prow"><div class="plabel">📍 Countries</div><div class="pvalue">${it.countries}</div></div>
       <div class="prow"><div class="plabel">📅 Dates</div><div class="pvalue">${it.dates}</div></div>
       <div class="prow"><div class="plabel">✈️ Departure</div><div class="pvalue">Amsterdam (AMS)</div></div>
-      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong">${fmt(pp)}</div></div>
+      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong">${money(pp)}</div></div>
     </div>
     <div class="pills">${it.tags.map(t=>`<span class="pill ${t}">${tagLabel[t]}</span>`).join('')}</div>
     ${it.flag ? `<div class="callout flag">⚠️ ${it.flag}</div>` : ''}
@@ -1203,7 +1543,7 @@ function renderPage(it){
           </td>
           <td>${h.checkin} → ${h.checkout}</td>
           <td>${h.nights}</td>
-          <td class="num">${fmt(h.total)}</td>
+          <td class="num">${money(h.total)}</td>
           <td><a href="${h.url}" target="_blank" rel="noopener">View →</a></td>
         </tr>`;}).join('')}
       </tbody>
@@ -1224,13 +1564,13 @@ function renderPage(it){
       `).join('')}
       <div class="flight-cost-row">
         <span class="lbl">Round-trip, per person</span>
-        <span class="val">${fmt(it.flight.costPerPerson)}</span>
+        <span class="val">${money(it.flight.costPerPerson)}</span>
       </div>
     </div>` : `
     <div class="flight-card">
       <div class="flight-cost-row" style="margin-top:0;padding-top:0;border-top:none;">
         <span class="lbl">Estimated average, per person</span>
-        <span class="val">${fmt(it.flight.costPerPerson)}</span>
+        <span class="val">${money(it.flight.costPerPerson)}</span>
       </div>
     </div>`}
     ${it.flight.altNote ? `<div class="callout">${it.flight.altNote}</div>` : ''}
@@ -1240,15 +1580,15 @@ function renderPage(it){
     <div class="table-wrap">
     <table class="ntable">
       <tbody>
-        <tr><td>Flights (2 travelers)</td><td class="num" colspan="4">${fmt(flightsTotal)}</td></tr>
-        <tr><td>Accommodation (${nights} nights, real rate)</td><td class="num" colspan="4">${fmt(it.price.accom)}</td></tr>
-        <tr style="font-weight:600"><td>Total, 2 travelers</td><td class="num" colspan="4">${fmt(total)}</td></tr>
+        <tr><td>Flights (2 travelers)</td><td class="num" colspan="4">${money(flightsTotal)}</td></tr>
+        <tr><td>Accommodation (${nights} nights, real rate)</td><td class="num" colspan="4">${money(it.price.accom)}</td></tr>
+        <tr style="font-weight:600"><td>Total, 2 travelers</td><td class="num" colspan="4">${money(total)}</td></tr>
       </tbody>
     </table>
     </div>
     <div class="total-callout">
       <span class="label">Per person</span>
-      <span class="val">${fmt(pp)}</span>
+      <span class="val">${money(pp)}</span>
     </div>
     <div class="callout">${it.note}</div>
   </div>`;
@@ -1273,7 +1613,7 @@ function renderHotelTable(hotels){
           </td>
           <td>${h.checkin} → ${h.checkout}</td>
           <td>${h.nights}</td>
-          <td class="num">${fmt(h.total)}</td>
+          <td class="num">${money(h.total)}</td>
           <td><a href="${h.url}" target="_blank" rel="noopener">View →</a></td>
         </tr>`;}).join('')}
       </tbody>
@@ -1291,7 +1631,7 @@ function renderFlightCard(flight){
     `).join('')}
     <div class="flight-cost-row">
       <span class="lbl">Round-trip, per person</span>
-      <span class="val">${fmt(flight.costPerPerson)}</span>
+      <span class="val">${money(flight.costPerPerson)}</span>
     </div>
   </div>`;
 }
@@ -1308,7 +1648,7 @@ function renderWindowPage(it){
       <div class="prow"><div class="plabel">📍 Countries</div><div class="pvalue">${it.countries}</div></div>
       <div class="prow"><div class="plabel">📅 Dates</div><div class="pvalue">${it.windows.map(w=>`${w.label}: ${w.dateRange}`).join('  ·  ')} (8 days each)</div></div>
       <div class="prow"><div class="plabel">✈️ Departure</div><div class="pvalue">Amsterdam (AMS)</div></div>
-      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong">${totals.map((t,i)=>`${it.windows[i].label}: ${fmt(t.pp)}`).join('  ·  ')}</div></div>
+      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong">${totals.map((t,i)=>`${it.windows[i].label}: ${money(t.pp)}`).join('  ·  ')}</div></div>
     </div>
     <div class="pills">${it.tags.map(t=>`<span class="pill ${t}">${tagLabel[t]}</span>`).join('')}
       <span class="pill" style="background:#eef0f2;color:#57606a;">🪟 Two windows researched — both shown below</span>
@@ -1343,8 +1683,8 @@ function renderWindowPage(it){
       ${renderFlightCard(w.flight)}
       ${renderHotelTable(w.hotels)}
       <div class="total-callout" style="margin-top:2px;">
-        <span class="label">${w.label} total, 2 travelers: ${fmt(t.total)}</span>
-        <span class="val">${fmt(t.pp)} pp</span>
+        <span class="label">${w.label} total, 2 travelers: ${money(t.total)}</span>
+        <span class="val">${money(t.pp)} pp</span>
       </div>
       `;
     }).join('<hr class="div" style="margin:26px 0;">')}
@@ -1357,7 +1697,7 @@ function renderWindowPage(it){
       <tbody>
         ${it.windows.map((w,i)=>{
           const t = totals[i];
-          return `<tr><td>${w.label}</td><td>${w.dateRange}</td><td class="num">${fmt(t.flightsTotal)}</td><td class="num">${fmt(t.accom)}</td><td class="num" style="font-weight:600">${fmt(t.total)}</td><td class="num" style="font-weight:600">${fmt(t.pp)}</td></tr>`;
+          return `<tr><td>${w.label}</td><td>${w.dateRange}</td><td class="num">${money(t.flightsTotal)}</td><td class="num">${money(t.accom)}</td><td class="num" style="font-weight:600">${money(t.total)}</td><td class="num" style="font-weight:600">${money(t.pp)}</td></tr>`;
         }).join('')}
       </tbody>
     </table>
@@ -1379,7 +1719,7 @@ function renderAccomRow(it, a, idx){
         ${noteHtml}
       </div>
     </td>
-    <td class="right price-cell"><span class="accom-price">${fmt(a.total)}</span></td>
+    <td class="right price-cell"><span class="accom-price">${money(a.total)}</span></td>
     <td class="right">
       <div class="accom-actions">
         <button class="locate-btn" onclick="locateAccommodation('${it.id}', ${idx}, this)">📍 Locate</button>
@@ -1405,7 +1745,7 @@ function renderComboMapPage(it){
       <div class="prow"><div class="plabel">📍 Countries</div><div class="pvalue">${it.countries}</div></div>
       <div class="prow"><div class="plabel">📅 Dates</div><div class="pvalue">${it.dates}</div></div>
       <div class="prow"><div class="plabel">✈️ Departure</div><div class="pvalue">Amsterdam (AMS)</div></div>
-      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong">${fmt(pp)}</div></div>
+      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong">${money(pp)}</div></div>
     </div>
     <div class="pills">${it.tags.map(t=>`<span class="pill ${t}">${tagLabel[t]}</span>`).join('')}</div>
     ${it.flag ? `<div class="callout flag">⚠️ ${it.flag}</div>` : ''}
@@ -1461,7 +1801,7 @@ function renderComboMapPage(it){
       `).join('')}
       <div class="flight-cost-row">
         <span class="lbl">All 4 legs, per person</span>
-        <span class="val">${fmt(it.flight.costPerPerson)}</span>
+        <span class="val">${money(it.flight.costPerPerson)}</span>
       </div>
     </div>
 
@@ -1470,25 +1810,25 @@ function renderComboMapPage(it){
     <div class="table-wrap">
     <table class="ntable">
       <tbody>
-        <tr><td>Travel (2 travelers, all 4 legs)</td><td class="num" colspan="4">${fmt(flightsTotal)}</td></tr>
-        <tr><td>Accommodation (your selected options)</td><td class="num" colspan="4">${fmt(accomTotal)}</td></tr>
-        <tr style="font-weight:600"><td>Total, 2 travelers</td><td class="num" colspan="4">${fmt(total)}</td></tr>
+        <tr><td>Travel (2 travelers, all 4 legs)</td><td class="num" colspan="4">${money(flightsTotal)}</td></tr>
+        <tr><td>Accommodation (your selected options)</td><td class="num" colspan="4">${money(accomTotal)}</td></tr>
+        <tr style="font-weight:600"><td>Total, 2 travelers</td><td class="num" colspan="4">${money(total)}</td></tr>
       </tbody>
     </table>
     </div>
     <div class="total-callout">
       <span class="label">Per person</span>
-      <span class="val">${fmt(pp)}</span>
+      <span class="val">${money(pp)}</span>
     </div>
     <div class="callout">${it.note}</div>
   </div>`;
 }
 
-/* ===================== Austria Grand Tour: state, storage, rendering ===================== */
+/* ===================== Grand/Compact Tour engine (shared by both Austria pages) ===================== */
 
-const gtChoice = {};        // stayIndex -> optionIndex (chosen accommodation)
-const gtCoords = {};        // "stayIdx-optIdx" -> {lat,lng}  (geocoded or manually entered)
-const gtMarkers = {};       // "stayIdx-optIdx" -> Leaflet marker
+const gtChoice  = {};   // itId -> { stayIdx: optIdx }
+const gtCoords  = {};   // itId -> { "si-oi": {lat,lng} }
+const gtMarkers = {};   // itId -> { "si-oi": marker }
 
 function gtStoreGet(key, fallback){
   try{ const v = window.localStorage.getItem(key); return v===null ? fallback : JSON.parse(v); }
@@ -1497,33 +1837,42 @@ function gtStoreGet(key, fallback){
 function gtStoreSet(key, val){
   try{ window.localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
 }
+function gtKey(si, oi){ return si + '-' + oi; }
 
 function gtInitState(it){
-  const saved = gtStoreGet('gt-choice', null);
+  if(gtChoice[it.id]) return;                       // already initialised
+  const saved = gtStoreGet('gt-choice-'+it.id, null);
+  gtChoice[it.id] = {};
   it.gt.stays.forEach((s,si)=>{
-    gtChoice[si] = (saved && saved[si] !== undefined) ? saved[si] : 0; // default: your rank-1 pick
+    const fallback = (it.gt.defaultChoice && it.gt.defaultChoice[si] !== undefined)
+      ? it.gt.defaultChoice[si] : 0;                // default: your sheet's pick, else rank 1
+    gtChoice[it.id][si] = (saved && saved[si] !== undefined) ? saved[si] : fallback;
   });
-  Object.assign(gtCoords, gtStoreGet('gt-coords', {}));
+
+  // coordinates: start from whatever the sheet supplied, then layer saved edits on top
+  const fromSheet = {};
+  it.gt.stays.forEach((s,si)=>s.options.forEach((o,oi)=>{
+    if(typeof o.lat === 'number' && typeof o.lng === 'number') fromSheet[gtKey(si,oi)] = {lat:o.lat, lng:o.lng};
+  }));
+  gtCoords[it.id] = Object.assign(fromSheet, gtStoreGet('gt-coords-'+it.id, {}));
+  gtMarkers[it.id] = gtMarkers[it.id] || {};
 }
 
-function gtTravelTotal(it){
-  return it.gt.travel.reduce((s,t)=>s+t.cost2, 0);
-}
+function gtTravelTotal(it){ return it.gt.travel.reduce((s,t)=>s+(t.cost2||0), 0); }
 function gtAccomTotal(it){
   let sum = 0;
   it.gt.stays.forEach((s,si)=>{
-    const oi = gtChoice[si];
+    const oi = gtChoice[it.id][si];
     if(oi !== null && oi !== undefined && s.options[oi]) sum += s.options[oi].total;
   });
   return sum;
 }
 
 function gtSelect(itId, si, oi){
-  gtChoice[si] = oi;
-  gtStoreSet('gt-choice', gtChoice);
   const it = DATA.find(x=>x.id===itId);
-  // repaint the option rows for this stay
-  document.querySelectorAll(`[data-stay="${si}"]`).forEach(el=>{
+  gtChoice[itId][si] = oi;
+  gtStoreSet('gt-choice-'+itId, gtChoice[itId]);
+  document.querySelectorAll(`[data-it="${itId}"][data-stay="${si}"]`).forEach(el=>{
     el.classList.toggle('chosen', parseInt(el.dataset.opt,10) === oi);
   });
   gtRefreshTotals(it);
@@ -1532,24 +1881,65 @@ function gtSelect(itId, si, oi){
 
 function gtRefreshTotals(it){
   const travel = gtTravelTotal(it);
-  const accom = gtAccomTotal(it);
-  const total = travel + accom;
-  const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = fmt(val); };
-  set('gt-travel-total', travel);
-  set('gt-accom-total', accom);
-  set('gt-grand-total', total);
-  set('gt-pp', Math.round(total/2));
-  const hero = document.getElementById('gt-hero-pp');
-  if(hero) hero.textContent = fmt(Math.round(total/2));
+  const accom  = gtAccomTotal(it);
+  const total  = travel + accom;
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.innerHTML = money(val); };
+  set(`gt-travel-total-${it.id}`, travel);
+  set(`gt-accom-total-${it.id}`, accom);
+  set(`gt-grand-total-${it.id}`, total);
+  set(`gt-pp-${it.id}`, Math.round(total/2));
+  set(`gt-hero-pp-${it.id}`, Math.round(total/2));
 }
 
-/* ---------- geocoding ---------- */
+/* ---------- map pins ---------- */
 
-function gtKey(si, oi){ return si + '-' + oi; }
+function gtPlaceMarker(it, map, si, oi, loc){
+  const key = gtKey(si, oi);
+  if(gtMarkers[it.id][key]) map.removeLayer(gtMarkers[it.id][key]);
+  const stay = it.gt.stays[si];
+  const opt  = stay.options[oi];
+  const isChosen = gtChoice[it.id][si] === oi;
+  const marker = L.circleMarker([loc.lat, loc.lng], {
+    radius: isChosen ? 8 : 6,
+    color: isChosen ? '#0f7a3d' : '#9b9a97',
+    weight: 2,
+    fillColor: isChosen ? '#ddf3e4' : '#ffffff',
+    fillOpacity: 1
+  }).addTo(map);
+  marker.bindPopup(()=>
+    `<b>#${opt.rank} · ${opt.name}</b><br>${stay.city} · ${opt.source} · ${fmt(opt.total)}` +
+    (opt.notes ? `<br><i>"${opt.notes}"</i>` : '') +
+    `<br><span class="popup-locate-link" onclick="gtScrollTo('${it.id}',${si},${oi})">View details ↓</span>`
+  );
+  gtMarkers[it.id][key] = marker;
+  return marker;
+}
+
+function gtRefreshMarkerStyles(it){
+  it.gt.stays.forEach((stay,si)=>stay.options.forEach((opt,oi)=>{
+    const m = gtMarkers[it.id][gtKey(si,oi)];
+    if(!m) return;
+    const isChosen = gtChoice[it.id][si] === oi;
+    m.setStyle({
+      radius: isChosen ? 8 : 6,
+      color: isChosen ? '#0f7a3d' : '#9b9a97',
+      fillColor: isChosen ? '#ddf3e4' : '#ffffff'
+    });
+  }));
+}
+
+function gtMarkPending(it){
+  it.gt.stays.forEach((stay,si)=>stay.options.forEach((opt,oi)=>{
+    const btn = document.getElementById(`gtpin-${it.id}-${si}-${oi}`);
+    if(!btn) return;
+    if(gtCoords[it.id][gtKey(si,oi)]){ btn.className='gt-btn'; btn.innerHTML='📍 Locate'; }
+    else { btn.className='gt-btn warn'; btn.innerHTML='📍 Add pin'; }
+  }));
+}
 
 async function gtGeocodeAll(it, map){
   const statusEl = document.getElementById('geo-status-'+it.id);
-  let placed = 0, needManual = 0, total = 0;
+  let placed = 0, pending = 0, total = 0;
   it.gt.stays.forEach(s=>{ total += s.options.length; });
 
   for(let si=0; si<it.gt.stays.length; si++){
@@ -1558,99 +1948,44 @@ async function gtGeocodeAll(it, map){
       const opt = stay.options[oi];
       const key = gtKey(si, oi);
 
-      if(gtCoords[key]){ gtPlaceMarker(it, map, si, oi, gtCoords[key]); placed++; continue; }
-
-      // only attempt lookup when we have a usable hint (a real place, not an Airbnb nickname)
-      if(opt.geo){
+      if(gtCoords[it.id][key]){                       // straight from the sheet, or saved earlier
+        gtPlaceMarker(it, map, si, oi, gtCoords[it.id][key]); placed++; continue;
+      }
+      if(opt.geo){                                    // only worth a lookup with a real place name
         const loc = await geocodeAddress(opt.geo);
         if(loc){
-          gtCoords[key] = loc; gtStoreSet('gt-coords', gtCoords);
+          gtCoords[it.id][key] = loc; gtStoreSet('gt-coords-'+it.id, gtCoords[it.id]);
           gtPlaceMarker(it, map, si, oi, loc); placed++;
-        } else { needManual++; }
+        } else pending++;
         await new Promise(r=>setTimeout(r, 1100));
-      } else {
-        needManual++;
-      }
+      } else pending++;
       if(statusEl) statusEl.innerHTML = `<span class="geo-dot"></span> Locating pins… ${placed} placed`;
     }
   }
   gtMarkPending(it);
   if(statusEl){
-    statusEl.innerHTML = needManual
-      ? `<span class="geo-dot done"></span> ${placed} of ${total} pins placed — ${needManual} need coordinates (use “Add pin” on those options)`
-      : `<span class="geo-dot done"></span> All ${placed} accommodation pins placed`;
+    statusEl.innerHTML = pending
+      ? `<span class="geo-dot done"></span> ${placed} of ${total} pins on the map — ${pending} have no coordinates yet (use “Add pin”)`
+      : `<span class="geo-dot done"></span> All ${placed} accommodation pins on the map`;
   }
-}
-
-function gtPlaceMarker(it, map, si, oi, loc){
-  const key = gtKey(si, oi);
-  if(gtMarkers[key]){ map.removeLayer(gtMarkers[key]); }
-  const stay = it.gt.stays[si];
-  const opt = stay.options[oi];
-  const isChosen = gtChoice[si] === oi;
-  const marker = L.circleMarker([loc.lat, loc.lng], {
-    radius: isChosen ? 8 : 6,
-    color: isChosen ? '#0f7a3d' : '#9b9a97',
-    weight: 2,
-    fillColor: isChosen ? '#ddf3e4' : '#ffffff',
-    fillOpacity: 1
-  }).addTo(map);
-  marker.bindPopup(
-    `<b>#${opt.rank} · ${opt.name}</b><br>${stay.city} · ${opt.source} · ${fmt(opt.total)}` +
-    (opt.notes ? `<br><i>"${opt.notes}"</i>` : '') +
-    `<br><span class="popup-locate-link" onclick="gtScrollTo('${it.id}',${si},${oi})">View details ↓</span>`
-  );
-  gtMarkers[key] = marker;
-  return marker;
-}
-
-function gtRefreshMarkerStyles(it){
-  it.gt.stays.forEach((stay,si)=>{
-    stay.options.forEach((opt,oi)=>{
-      const m = gtMarkers[gtKey(si,oi)];
-      if(!m) return;
-      const isChosen = gtChoice[si] === oi;
-      m.setStyle({
-        radius: isChosen ? 8 : 6,
-        color: isChosen ? '#0f7a3d' : '#9b9a97',
-        fillColor: isChosen ? '#ddf3e4' : '#ffffff'
-      });
-    });
-  });
-}
-
-function gtMarkPending(it){
-  it.gt.stays.forEach((stay,si)=>{
-    stay.options.forEach((opt,oi)=>{
-      const btn = document.getElementById(`gtpin-${si}-${oi}`);
-      if(!btn) return;
-      if(gtCoords[gtKey(si,oi)]){
-        btn.className = 'gt-btn';
-        btn.innerHTML = '📍 Locate';
-      } else {
-        btn.className = 'gt-btn warn';
-        btn.innerHTML = '📍 Add pin';
-      }
-    });
-  });
 }
 
 /* ---------- locate / manual coordinates ---------- */
 
 async function gtLocate(itId, si, oi){
-  const it = DATA.find(x=>x.id===itId);
+  const it  = DATA.find(x=>x.id===itId);
   const map = mapInstances[itId];
   const key = gtKey(si, oi);
 
   document.querySelectorAll('.gt-opt').forEach(el=>el.classList.remove('highlight'));
-  const row = document.getElementById(`gtopt-${si}-${oi}`);
+  const row = document.getElementById(`gtopt-${itId}-${si}-${oi}`);
   if(row) row.classList.add('highlight');
 
-  if(!gtCoords[key]){ gtAskCoords(itId, si, oi); return; }
+  if(!gtCoords[itId][key]){ gtAskCoords(itId, si, oi); return; }
 
   const mapEl = document.getElementById('map-'+itId);
   if(mapEl) mapEl.scrollIntoView({behavior:'smooth', block:'center'});
-  let marker = gtMarkers[key] || gtPlaceMarker(it, map, si, oi, gtCoords[key]);
+  const marker = gtMarkers[itId][key] || gtPlaceMarker(it, map, si, oi, gtCoords[itId][key]);
   setTimeout(()=>{
     map.invalidateSize();
     map.setView(marker.getLatLng(), 13, {animate:true});
@@ -1659,45 +1994,44 @@ async function gtLocate(itId, si, oi){
 }
 
 function gtAskCoords(itId, si, oi){
-  const it = DATA.find(x=>x.id===itId);
+  const it  = DATA.find(x=>x.id===itId);
   const opt = it.gt.stays[si].options[oi];
   const key = gtKey(si, oi);
-  const existing = gtCoords[key] ? `${gtCoords[key].lat}, ${gtCoords[key].lng}` : '';
+  const cur = gtCoords[itId][key];
   const input = window.prompt(
     `Coordinates for:\n${opt.name}\n(${it.gt.stays[si].city})\n\n` +
-    `Open the listing, right-click the map spot in Google Maps and pick the lat/lng, then paste it here as:  47.5847, 13.5372\n\n` +
+    `In Google Maps, right-click the spot and click the lat/lng to copy it, then paste here as:  47.5847, 13.5372\n\n` +
     `Leave empty and press OK to remove this pin.`,
-    existing
+    cur ? `${cur.lat}, ${cur.lng}` : ''
   );
-  if(input === null) return;                     // cancelled
+  if(input === null) return;
   const trimmed = input.trim();
-  if(trimmed === ''){                            // clear
-    delete gtCoords[key];
-    gtStoreSet('gt-coords', gtCoords);
+  if(trimmed === ''){
+    delete gtCoords[itId][key];
+    gtStoreSet('gt-coords-'+itId, gtCoords[itId]);
     const map = mapInstances[itId];
-    if(gtMarkers[key] && map){ map.removeLayer(gtMarkers[key]); delete gtMarkers[key]; }
+    if(gtMarkers[itId][key] && map){ map.removeLayer(gtMarkers[itId][key]); delete gtMarkers[itId][key]; }
     gtMarkPending(it);
     return;
   }
   const m = trimmed.match(/^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/);
   if(!m){ window.alert('Could not read that. Use the format:  47.5847, 13.5372'); return; }
   const lat = parseFloat(m[1]), lng = parseFloat(m[2]);
-  if(lat < -90 || lat > 90 || lng < -180 || lng > 180){ window.alert('Those numbers are out of range for latitude/longitude.'); return; }
-  gtCoords[key] = {lat, lng};
-  gtStoreSet('gt-coords', gtCoords);
-  gtPlaceMarker(it, mapInstances[itId], si, oi, gtCoords[key]);
+  if(lat<-90 || lat>90 || lng<-180 || lng>180){ window.alert('Those numbers are out of range for latitude/longitude.'); return; }
+  gtCoords[itId][key] = {lat, lng};
+  gtStoreSet('gt-coords-'+itId, gtCoords[itId]);
+  gtPlaceMarker(it, mapInstances[itId], si, oi, gtCoords[itId][key]);
   gtMarkPending(it);
   gtLocate(itId, si, oi);
 }
 
 function gtScrollTo(itId, si, oi){
-  const row = document.getElementById(`gtopt-${si}-${oi}`);
-  if(row){
-    row.scrollIntoView({behavior:'smooth', block:'center'});
-    document.querySelectorAll('.gt-opt').forEach(el=>el.classList.remove('highlight'));
-    row.classList.add('highlight');
-    setTimeout(()=>row.classList.remove('highlight'), 2600);
-  }
+  const row = document.getElementById(`gtopt-${itId}-${si}-${oi}`);
+  if(!row) return;
+  row.scrollIntoView({behavior:'smooth', block:'center'});
+  document.querySelectorAll('.gt-opt').forEach(el=>el.classList.remove('highlight'));
+  row.classList.add('highlight');
+  setTimeout(()=>row.classList.remove('highlight'), 2600);
 }
 
 /* ---------- page ---------- */
@@ -1705,9 +2039,9 @@ function gtScrollTo(itId, si, oi){
 function renderGrandTourPage(it){
   gtInitState(it);
   const travel = gtTravelTotal(it);
-  const accom = gtAccomTotal(it);
-  const total = travel + accom;
-  const modeIcon = m => m==='train' ? '🚆' : (m==='car' ? '🚗' : '✈️');
+  const accom  = gtAccomTotal(it);
+  const total  = travel + accom;
+  const icon = m => m==='train' ? '🚆' : (m==='car' ? '🚗' : '✈️');
 
   return `<div class="page-inner">
     <div class="page-icon">${it.icon}</div>
@@ -1717,16 +2051,17 @@ function renderGrandTourPage(it){
     <div class="props">
       <div class="prow"><div class="plabel">📍 Countries</div><div class="pvalue">${it.countries}</div></div>
       <div class="prow"><div class="plabel">📅 Dates</div><div class="pvalue">${it.dates}</div></div>
-      <div class="prow"><div class="plabel">✈️ Departure</div><div class="pvalue">Amsterdam (AMS) → Vienna · home from Salzburg (SZG)</div></div>
-      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong"><span id="gt-hero-pp">${fmt(Math.round(total/2))}</span></div></div>
+      <div class="prow"><div class="plabel">✈️ Departure</div><div class="pvalue">${it.departure || 'Amsterdam (AMS)'}</div></div>
+      <div class="prow"><div class="plabel">💶 Per person</div><div class="pvalue strong"><span id="gt-hero-pp-${it.id}">${money(Math.round(total/2))}</span></div></div>
     </div>
     <div class="pills">${it.tags.map(t=>`<span class="pill ${t}">${tagLabel[t]}</span>`).join('')}</div>
+    ${it.flag ? `<div class="callout flag">⚠️ ${it.flag}</div>` : ''}
 
     <hr class="div">
     <h2 class="sec">🗺️ The route in Austria</h2>
-    <div class="geo-status" id="geo-status-${it.id}"><span class="geo-dot"></span> Locating accommodation pins…</div>
+    <div class="geo-status" id="geo-status-${it.id}"><span class="geo-dot"></span> Placing accommodation pins…</div>
     <div class="mapbox" id="map-${it.id}"></div>
-    <div class="map-cap">Vienna → Innsbruck → Salzburg → the cabin, plus day trips. Flights in and out aren't drawn. Click any pin for details; "Locate" on an option below flies the map to it.</div>
+    <div class="map-cap">${it.mapCap || "Flights in and out aren't drawn — this is the Austrian leg only. Click a pin for details; “Locate” on any option below flies the map to it."}</div>
 
     <h2 class="sec">📅 Day by day</h2>
     ${it.gt.days.map(d=>`
@@ -1742,7 +2077,7 @@ function renderGrandTourPage(it){
 
     <hr class="div">
     <h2 class="sec">🏨 Accommodation — pick one per stop</h2>
-    <div class="callout" style="margin-bottom:16px;">Listed in your preference order from the sheet (#1 = most preferred). Tap any option to select it — the totals below update instantly, and your choice is remembered on this device.</div>
+    <div class="callout" style="margin-bottom:16px;">In your preference order from the sheet (#1 = most preferred). Tap an option to select it — every total updates instantly and your choice is remembered on this device.</div>
 
     ${it.gt.stays.map((s,si)=>`
       <div class="gt-stay">
@@ -1752,8 +2087,8 @@ function renderGrandTourPage(it){
           <span class="gt-stay-count">${s.options.length} options</span>
         </div>
         ${s.options.map((o,oi)=>`
-          <div class="gt-opt${gtChoice[si]===oi?' chosen':''}" id="gtopt-${si}-${oi}"
-               data-stay="${si}" data-opt="${oi}" onclick="gtSelect('${it.id}',${si},${oi})">
+          <div class="gt-opt${gtChoice[it.id][si]===oi?' chosen':''}" id="gtopt-${it.id}-${si}-${oi}"
+               data-it="${it.id}" data-stay="${si}" data-opt="${oi}" onclick="gtSelect('${it.id}',${si},${oi})">
             <div class="gt-radio"></div>
             <div class="gt-rank">${o.rank}</div>
             <div class="gt-body">
@@ -1763,12 +2098,12 @@ function renderGrandTourPage(it){
               </div>
               ${o.notes ? `<div class="gt-note">"${o.notes}"</div>` : ''}
               <div class="gt-actions" onclick="event.stopPropagation()">
-                <button class="gt-btn" id="gtpin-${si}-${oi}" onclick="gtLocate('${it.id}',${si},${oi})">📍 Locate</button>
-                <a class="gt-btn" href="${o.url}" target="_blank" rel="noopener">Open listing ↗</a>
+                <button class="gt-btn" id="gtpin-${it.id}-${si}-${oi}" onclick="gtLocate('${it.id}',${si},${oi})">📍 Locate</button>
+                ${o.url ? `<a class="gt-btn" href="${o.url}" target="_blank" rel="noopener">Open listing ↗</a>` : ''}
                 <button class="gt-btn" onclick="gtAskCoords('${it.id}',${si},${oi})">✎ Coords</button>
               </div>
             </div>
-            <div class="gt-price">${fmt(o.total)}</div>
+            <div class="gt-price">${money(o.total)}</div>
           </div>
         `).join('')}
       </div>
@@ -1778,15 +2113,13 @@ function renderGrandTourPage(it){
     <h2 class="sec">🚆 Getting there & around</h2>
     ${it.gt.travel.map(t=>`
       <div class="gt-leg">
-        <div class="gt-leg-icon">${modeIcon(t.mode)}</div>
+        <div class="gt-leg-icon">${icon(t.mode)}</div>
         <div class="gt-leg-body">
           <div class="gt-leg-route">${t.leg}</div>
-          <div class="gt-leg-meta">
-            ${t.carrier ? t.carrier + ' · ' : ''}${t.date || ''}${t.times ? ' · ' + t.times : ''}
-          </div>
+          <div class="gt-leg-meta">${[t.carrier, t.date, t.times].filter(Boolean).join(' · ')}</div>
           ${t.note ? `<div class="gt-leg-note">${t.note}</div>` : ''}
         </div>
-        <div class="gt-leg-cost">${fmt(t.cost2)}</div>
+        <div class="gt-leg-cost">${money(t.cost2)}</div>
       </div>
     `).join('')}
     <div class="callout">All travel prices above are the <b>total for 2 people</b>, straight from your sheet.</div>
@@ -1794,17 +2127,17 @@ function renderGrandTourPage(it){
     <hr class="div">
     <h2 class="sec">💰 The numbers — travel + accommodation</h2>
     <div class="gt-total-card">
-      <div class="gt-total-row"><span>Travel, 2 travelers (5 legs)</span><span class="v" id="gt-travel-total">${fmt(travel)}</span></div>
-      <div class="gt-total-row"><span>Accommodation, your selections</span><span class="v" id="gt-accom-total">${fmt(accom)}</span></div>
-      <div class="gt-total-row sum"><span>Total, 2 travelers</span><span class="v" id="gt-grand-total">${fmt(total)}</span></div>
+      <div class="gt-total-row"><span>Travel, 2 travelers</span><span class="v" id="gt-travel-total-${it.id}">${money(travel)}</span></div>
+      <div class="gt-total-row"><span>Accommodation, your selections</span><span class="v" id="gt-accom-total-${it.id}">${money(accom)}</span></div>
+      <div class="gt-total-row sum"><span>Total, 2 travelers</span><span class="v" id="gt-grand-total-${it.id}">${money(total)}</span></div>
     </div>
     <div class="total-callout">
       <span class="label">Per person</span>
-      <span class="val" id="gt-pp">${fmt(Math.round(total/2))}</span>
+      <span class="val" id="gt-pp-${it.id}">${money(Math.round(total/2))}</span>
     </div>
     <div class="callout">${it.gt.notincluded}</div>
     ${it.gt.warnings.map(w=>`<div class="callout" style="border-left:3px solid #e8c98a;">⚠️ ${w}</div>`).join('')}
-    <div class="callout">${it.note}</div>
+    ${it.note ? `<div class="callout">${it.note}</div>` : ''}
   </div>`;
 }
 
@@ -1934,8 +2267,8 @@ function createAccomMarker(it, a, idx, loc, map){
   const marker = L.circleMarker([loc.lat, loc.lng], {
     radius: a.selected ? 8 : 6, color: stroke, weight: 2, fillColor: fill, fillOpacity: 1
   }).addTo(map);
-  marker.bindPopup(
-    `<b>${a.name}</b>${a.selected?' ✓':''}<br>${a.source} · ${fmt(a.total)}` +
+  marker.bindPopup(()=>
+    `<b>${a.name}</b>${a.selected?' ✓':''}<br>${a.source} · ${money(a.total)}` +
     (a.notes ? `<br><i>"${a.notes}"</i>` : '') +
     `<br><span class="popup-locate-link" onclick="scrollToAccommodation('${it.id}',${idx})">View details ↓</span>`
   );
@@ -2022,6 +2355,7 @@ function selectPage(id){
   window.scrollTo({top:0});
 }
 
+renderCurrencyToggle();
 renderSidebar();
 renderMain();
 initMap(DATA[0]);
