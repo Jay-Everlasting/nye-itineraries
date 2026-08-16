@@ -65,7 +65,7 @@
   .prow{display:flex; border-bottom:1px solid var(--border); font-size:13.5px;}
   .prow:last-child{border-bottom:none;}
   .plabel{width:150px; flex-shrink:0; padding:8px 12px; color:var(--text-muted); background:var(--bg-sidebar); display:flex; align-items:center; gap:6px;}
-  .pvalue{padding:8px 12px; flex:1; display:flex; align-items:center;}
+  .pvalue{padding:8px 12px; flex:1; display:flex; align-items:center; min-width:0; overflow-wrap:anywhere;}
   .pvalue.strong{font-weight:600;}
 
   .pills{display:flex; gap:6px; margin:14px 0 28px; flex-wrap:wrap;}
@@ -339,13 +339,50 @@
   .gt-total-row.sum{background:var(--bg-sidebar); font-weight:700;}
   .gt-missing{font-size:12px; color:#8a5b0f; background:#fff6e5; padding:9px 14px; border-radius:7px; margin-bottom:10px;}
 
+  /* long property names / notes must never overflow their box */
+  .gt-name, .gt-note, .gt-leg-route, .gt-leg-meta, .gt-leg-note{overflow-wrap:anywhere;}
+
   @media (max-width:600px){
-    .gt-opt{padding:12px; gap:9px;}
-    .gt-price{margin-left:0; padding-left:0; font-size:15px; width:100%; margin-top:6px;}
-    .gt-line1{gap:6px;}
-    .gt-leg{padding:12px; gap:9px;}
-    .gt-leg-cost{padding-left:0;}
-    .gt-btn{font-size:11px; padding:7px 9px;}
+    /* option rows: [radio][rank] ....... [price]  then full-width details underneath */
+    .gt-opt{flex-wrap:wrap; align-items:center; padding:12px; gap:8px;}
+    .gt-radio{order:1; margin-top:0;}
+    .gt-rank{order:2;}
+    .gt-price{order:3; margin-left:auto; padding-left:0; font-size:16px;}
+    .gt-body{order:4; flex:1 1 100%; }
+    .gt-line1{gap:6px; margin-bottom:2px;}
+    .gt-name{font-size:13.5px;}
+    .gt-note{font-size:12px;}
+
+    /* action buttons share the width evenly and stay thumb-sized */
+    .gt-actions{gap:6px; margin-top:10px;}
+    .gt-btn{flex:1 1 auto; justify-content:center; font-size:11.5px; padding:8px 6px; min-height:42px;}
+
+    /* stop headers */
+    .gt-stay{margin-bottom:24px;}
+    .gt-stay-head{gap:6px 10px; margin-bottom:10px;}
+    .gt-stay-city{font-size:14.5px;}
+    .gt-stay-dates{font-size:12px; flex:1 1 100%; order:3;}
+    .gt-stay-count{margin-left:auto;}
+
+    /* travel legs: cost drops to its own right-aligned line */
+    .gt-leg{flex-wrap:wrap; padding:12px; gap:10px;}
+    .gt-leg-icon{width:30px; height:30px; font-size:15px;}
+    .gt-leg-body{flex:1 1 calc(100% - 40px);}
+    .gt-leg-route{font-size:12.5px;}
+    .gt-leg-meta{font-size:12px;}
+    .gt-leg-cost{flex:1 1 100%; text-align:right; padding-left:0; margin-top:2px;}
+
+    .gt-total-row{padding:10px 13px; font-size:12.5px;}
+  }
+
+  @media (max-width:400px){
+    .gt-opt{padding:11px 10px; gap:7px;}
+    .gt-rank{width:22px; height:22px; font-size:11px;}
+    .gt-radio{width:18px; height:18px;}
+    .gt-price{font-size:15px;}
+    .gt-name{font-size:13px;}
+    .gt-btn{font-size:11px; padding:8px 4px; min-height:42px;}
+    .gt-leg{padding:11px 10px;}
   }
 
   /* ---------- very narrow phones ---------- */
