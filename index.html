@@ -133,6 +133,49 @@
   /* ---------- tablet / small laptop ---------- */
   .money{white-space:nowrap;}
 
+  /* optional / not-booked day block */
+  details.day.optional{
+    border:1px dashed #c9c9c6; background:#fafaf9; border-radius:6px;
+  }
+  details.day.optional summary{opacity:.9;}
+  details.day.optional .day-badge,
+  details.day.optional .day-date{color:#9b9a97;}
+  details.day.optional .day-title{color:#6b6b68; font-weight:500;}
+  details.day.optional .day-content{color:#5a5a57;}
+  .day-optional-tag{
+    display:inline-block; margin-left:6px; font-size:10px; font-weight:700; letter-spacing:.03em;
+    text-transform:uppercase; color:#787774; background:#ececea; border:1px solid #ddddda;
+    padding:2px 7px; border-radius:20px; vertical-align:middle;
+  }
+  @media (max-width:480px){
+    .day-optional-tag{font-size:9px; padding:1px 6px;}
+  }
+
+  /* "click to read" affordance on a collapsed optional day */
+  .day-click-hint{
+    display:inline-flex; align-items:center; gap:4px; margin-left:8px;
+    font-size:11px; font-weight:600; color:#2383e2; white-space:nowrap;
+  }
+  .day-click-hint::before{content:'\261E'; font-size:12px; line-height:1;}
+  .day-click-hint::after{content:'click to read';}
+  @media (hover:none){ .day-click-hint::after{content:'tap to read';} }
+  details.day.optional[open] .day-click-hint{display:none;}
+  details.day.optional:hover{border-color:#a9b6c9; background:#f6f8fa;}
+
+  /* swipe hint for the itinerary bar (phones/tablets only) */
+  .nav-hint{display:none;}
+  @media (max-width:820px){
+    .nav-hint{
+      display:block; padding:7px 12px 8px; font-size:11.5px; color:var(--text-faint);
+      background:var(--bg-sidebar); border-bottom:1px solid var(--border); text-align:center;
+    }
+    .nav-hint b{color:var(--text-muted); font-weight:600;}
+  }
+  @media (max-width:400px){
+    .nav-hint{font-size:11px; padding:6px 10px 7px;}
+    .day-click-hint{font-size:10.5px; margin-left:6px;}
+  }
+
   /* currency toggle */
   .cur-toggle{
     display:inline-flex; gap:2px; padding:2px; margin:0 10px 12px;
@@ -431,6 +474,8 @@
   <div id="side-list"></div>
   <div class="side-foot">8 days · 2 travelers<br>Dec 28 – Jan 4</div>
 </div>
+
+<div class="nav-hint">← <b>Swipe the bar above</b> to see all the itineraries →</div>
 
 <div class="main" id="main"></div>
 
@@ -935,7 +980,7 @@ const AUSTRIA_CT = {
   },
   {
    "city": "Mountain cabin",
-   "label": "Jan 1 - Jan 5 (4 nights) - Car Only",
+   "label": "Jan 1 - Jan 4 (3 nights) - Car Only",
    "options": [
     {
      "rank": 1,
@@ -1036,8 +1081,8 @@ const AUSTRIA_CT = {
   {
    "leg": "Rental car (Salzburg -> cabin -> SZG airport)",
    "mode": "car",
-   "carrier": "4 days. Pick up in Salzburg city, drop at the airport",
-   "date": "Jan 1 - Jan 5",
+   "carrier": "3 days. Pick up in Salzburg city, drop at the airport",
+   "date": "Jan 1 - Jan 4",
    "times": "18:30 (we can leave luggage in a locker in salzburg for 18 euros for the entire day until we pick up the car)",
    "cost2": 365.0,
    "note": "From sixt - Pegoet 208 with winter tiers and chains included + insurance"
@@ -1046,7 +1091,7 @@ const AUSTRIA_CT = {
    "leg": "SZG -> AMS",
    "mode": "flight",
    "carrier": "transavia",
-   "date": "Jan 5",
+   "date": "Jan 4",
    "times": "21:30 -> 23:15",
    "cost2": 230.0,
    "note": "Late night flight, will we catch the last train 👀 ?"
@@ -1092,14 +1137,15 @@ const AUSTRIA_CT = {
   {
    "d": 7,
    "date": "Jan 4",
-   "title": "Cabin - ski / sled or a second lake",
-   "details": "Option A: Dachstein West (Gosau Hornspitz) - gear ~EUR 30-35pp/day, beginner pass ~EUR 40-50pp, or rent a toboggan (~EUR 10-15). Option B: drive to Bad Ischl or Wolfgangsee for a lower-key day. Final sauna. PACK TONIGHT."
+   "title": "Cabin → Salzburg Airport → home",
+   "details": "Last full day, and the late flight means you actually get to use it. Morning: Dachstein West (Gosau Hornspitz) for skiing or a toboggan, a marked Winterwanderweg, or simply the sauna — gear ~EUR 30-35pp/day, beginner pass ~EUR 40-50pp if you ski. Check out and load the car in the late afternoon, drive to Salzburg Airport (~1h – 1h15) and drop the Sixt car. Flight 21:30 → 23:15."
   },
   {
    "d": 8,
    "date": "Jan 5",
-   "title": "Departure",
-   "details": "Breakfast, check the cabin. Drive to Salzburg Airport (~1h - 1h15). Return the car. Salzburg is small - 2h before departure is plenty. Adjust to your actual flight: departure minus 2h30."
+   "optional": true,
+   "title": "Optional extra night — not booked",
+   "details": "Most of the cabins would let you stay through to 5 Jan if you wanted one more night. The catch is the flight home: the 5 Jan options are noticeably longer and rely on tight connections — for example 14:45 → 17:55 with only a 50-minute layover in Frankfurt. Miss that and you’re rebooking on a holiday weekend. The 4 Jan evening flight is the simpler, lower-risk exit, which is why the plan above ends there."
   }
  ],
  "notincluded": "NOT included in the total above (estimates for 2 people): Vienna 72h transport passes EUR 35 | Fuel + parking EUR 50-70 | Schoenbrunn + one museum EUR 98 | Ski gear + lift pass, 1 day EUR 140-170 (optional) | Hallstatt parking + Beinhaus EUR 16 | Food & drink ~EUR 60/day x 8 days = EUR 480. Roughly EUR 820-870 all in.",
@@ -1132,7 +1178,7 @@ const DATA = [
 },
 {
   id:'austria_ct', icon:'🎿', name:'Austria (Compact Tour)', subtitle:'Vienna → train to Salzburg → mountain cabin',
-  countries:'Austria', dates:'Dec 29 – Jan 5 · 8 days, 7 nights', tags:['snow','nye'],
+  countries:'Austria', dates:'Dec 29 – Jan 4 · 7 days, 6 nights', tags:['snow','nye'],
   departure:'Amsterdam (AMS) → Vienna · home from Salzburg (SZG)',
   isGrandTour:true,
   gt: AUSTRIA_CT,
@@ -2065,11 +2111,11 @@ function renderGrandTourPage(it){
 
     <h2 class="sec">📅 Day by day</h2>
     ${it.gt.days.map(d=>`
-      <details class="day" open>
+      <details class="day${d.optional?' optional':''}"${d.optional?'':' open'}>
         <summary>
           <span class="day-badge">${String(d.d).padStart(2,'0')}</span>
           <span class="day-date">${d.date}</span>
-          <span class="day-title">${d.title}</span>
+          <span class="day-title">${d.title}${d.optional?'<span class="day-optional-tag">optional</span><span class="day-click-hint"></span>':''}</span>
         </summary>
         <div class="day-content">${d.details}</div>
       </details>
