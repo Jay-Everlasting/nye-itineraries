@@ -16,8 +16,11 @@ if (error) { console.error(error.message); process.exit(1); }
 const problems = [];
 for (const it of data) {
   const vs = it.variants ?? [];
-  let stays = 0, opts = 0, accom = 0;
+  let stays = 0, opts = 0;
+  // Windows are alternatives, not additive — report each separately.
+  const perWindow = [];
   for (const v of vs) {
+    let accom = 0;
     for (const s of v.stays ?? []) {
       stays++;
       const os = s.stay_options ?? [];
@@ -33,10 +36,12 @@ for (const it of data) {
       }
     }
     if (!(v.stays ?? []).length) problems.push(`${it.slug}: window "${v.label ?? '—'}" has no stays`);
+    perWindow.push(accom);
   }
   console.log(
     `${it.slug.padEnd(12)} ${it.published ? 'live  ' : 'hidden'} ` +
-      `${String(vs.length).padStart(2)}w ${String(stays).padStart(2)}stays ${String(opts).padStart(3)}opts  accom EUR ${accom}`
+      `${String(vs.length).padStart(2)}w ${String(stays).padStart(2)}stays ${String(opts).padStart(3)}opts  ` +
+      `accom EUR ${perWindow.join(' or ')}`
   );
 }
 console.log('');

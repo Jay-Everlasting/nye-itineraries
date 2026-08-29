@@ -4,7 +4,7 @@ import RowForm from '@/components/admin/RowForm';
 import OptionRow from '@/components/admin/OptionRow';
 import DeleteButton from '@/components/admin/DeleteButton';
 import { SECTIONS } from '@/lib/admin-sections';
-import { deleteItinerary, duplicateItinerary } from '../../actions';
+import { deleteItinerary, duplicateItinerary, deleteRow } from '../../actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,6 +68,22 @@ export default async function SectionPage({
                       {String(stay.label ?? '')} · {options.length}{' '}
                       {options.length === 1 ? 'option' : 'options'}
                     </span>
+                    {/* Removing a whole city needs to be reachable in one click,
+                        not buried in settings — duplicates happen. */}
+                    <form action={deleteRow} className="adm-card-del">
+                      <input type="hidden" name="_table" value="stays" />
+                      <input type="hidden" name="_id" value={String(stay.id)} />
+                      <input type="hidden" name="_slug" value={slug} />
+                      <DeleteButton
+                        action={deleteRow}
+                        label="✕ Remove city"
+                        confirmText={
+                          options.length
+                            ? `Remove "${String(stay.city)}" and all ${options.length} of its accommodation options? This cannot be undone.`
+                            : `Remove the empty city "${String(stay.city)}"?`
+                        }
+                      />
+                    </form>
                   </header>
 
                   <div className="opt-head">

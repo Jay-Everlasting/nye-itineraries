@@ -679,3 +679,7 @@
     font-size:12px; font-weight:650; color:#0b6e99; padding:2px 2px 7px;
   }
   .adm-add-city > summary{color:var(--text-muted);}
+
+  /* "Remove city" sits at the right of each stay card header */
+  .adm-card-del{margin-left:auto;}
+  .adm-card-del .adm-btn.danger{padding:5px 10px; min-height:30px; font-size:11.5px;}
