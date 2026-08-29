@@ -50,9 +50,16 @@ if (!password) {
   console.error('Usage: npm run set-password -- <password>');
   process.exit(1);
 }
-if (password.length < 6) {
-  console.error('Use at least 6 characters.');
+if (password.length < 4) {
+  console.error('Use at least 4 characters.');
   process.exit(1);
+}
+if (password.length < 8 || /^\d+$/.test(password)) {
+  const space = /^\d+$/.test(password) ? 10 ** password.length : null;
+  console.warn(
+    `Note: short/numeric password${space ? ` (~${space.toLocaleString('en-US')} combinations)` : ''}.` +
+      ' Guessable by an attacker who finds the URL.'
+  );
 }
 
 const db = createClient(URL_, SECRET, { auth: { persistSession: false } });

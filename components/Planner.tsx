@@ -97,6 +97,12 @@ export default function Planner({
           })}
         </div>
 
+        {/* Sibling of .side-foot, not a child: the <=820px rules hide
+            .side-foot entirely, which would take the link with it. */}
+        <a className="side-admin" href="/admin">
+          🛠️ Manage
+        </a>
+
         <div className="side-foot">
           {itineraries.length} options · 2 travelers
           <br />

@@ -493,3 +493,18 @@
     margin-top:16px; text-decoration:none;
   }
   .auth-link:hover{color:#2383e2; text-decoration:underline;}
+
+  /* link from the sidebar to the admin area */
+  .side-admin{
+    display:block; margin-bottom:10px; padding:7px 9px; border-radius:6px;
+    font-size:12.5px; font-weight:600; color:var(--text-muted);
+    background:var(--bg-hover); text-decoration:none; text-align:center;
+  }
+  .side-admin:hover{background:var(--bg-active); color:var(--text); text-decoration:none;}
+  @media (max-width:820px){
+    /* sidebar is a horizontal bar here; pin the link after the currency toggle */
+    .sidebar .side-admin{
+      display:flex; align-items:center; order:3; flex:0 0 auto;
+      margin:0 0 0 6px; padding:7px 10px; min-height:34px; white-space:nowrap;
+    }
+  }
