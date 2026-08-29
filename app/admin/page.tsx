@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { admin } from '@/lib/supabase/admin';
 import { EDIT_COOKIE, verifySession } from '@/lib/auth';
 import { signOutEditor } from '../actions/auth';
+import { createItinerary } from './actions';
 import PublishToggle from './PublishToggle';
 
 export const dynamic = 'force-dynamic';
@@ -24,82 +25,91 @@ export default async function AdminPage() {
   const mins = minutesLeft % 60;
 
   return (
-    <div className="page-inner" style={{ maxWidth: 860 }}>
-      <div className="page-icon">🛠️</div>
-      <h1>Manage itineraries</h1>
-      <div className="page-sub">
-        Signed in as <b>{session?.email}</b> · session ends in {hrs}h {String(mins).padStart(2, '0')}m
-      </div>
-
-      <div className="props">
-        <div className="prow">
-          <div className="plabel">📋 Itineraries</div>
-          <div className="pvalue">{itineraries?.length ?? 0}</div>
-        </div>
-        <div className="prow">
-          <div className="plabel">👥 Editors</div>
-          <div className="pvalue">{editors?.map((e) => e.email).join(', ') || '—'}</div>
+    <div className="adm-wrap">
+      <div className="adm-head">
+        <a className="adm-back" href="/">
+          ← Back to the trips
+        </a>
+        <h1>🛠️ Manage itineraries</h1>
+        <div className="adm-sub">
+          Signed in as <b>{session?.email}</b> · editing ends in {hrs}h{' '}
+          {String(mins).padStart(2, '0')}m
         </div>
       </div>
 
-      <div className="callout">
-        Editors are managed from your machine, not here — a signed-in editor cannot grant access to
-        anyone else. Use <code>npm run editors -- add someone@example.com</code>.
+      <h2 className="adm-h2">Itineraries</h2>
+      <div className="adm-list">
+        {(itineraries ?? []).map((it) => {
+          const variants = (it.variants ?? []) as { stays: unknown[]; days: unknown[] }[];
+          const stays = variants.reduce((n, v) => n + (v.stays?.length ?? 0), 0);
+          const days = variants.reduce((n, v) => n + (v.days?.length ?? 0), 0);
+          return (
+            <div className="adm-item" key={it.id}>
+              <span className="adm-item-icon">{it.icon}</span>
+              <span className="adm-item-main">
+                <a className="adm-item-name" href={`/admin/${it.slug}`}>
+                  {it.name}
+                </a>
+                <span className="adm-item-meta">
+                  {variants.length} window{variants.length === 1 ? '' : 's'} · {stays} stays ·{' '}
+                  {days} days
+                </span>
+              </span>
+              <PublishToggle id={it.id} published={it.published} name={it.name} />
+              <a className="adm-btn" href={`/admin/${it.slug}`}>
+                Edit →
+              </a>
+            </div>
+          );
+        })}
       </div>
 
-      <hr className="div" />
-      <h2 className="sec">📋 Itineraries</h2>
+      <h2 className="adm-h2">Create a new itinerary</h2>
+      <form action={createItinerary} className="adm-row adm-new">
+        <p className="adm-help">
+          Starts empty and hidden, with one date window ready. Fill it in on the next screen, then
+          switch it to visible. To base it on an existing trip, open that trip and use Duplicate
+          instead.
+        </p>
+        <div className="adm-grid">
+          <label className="adm-field">
+            <span className="adm-label">Name</span>
+            <input type="text" name="name" placeholder="Japan 2027" required />
+          </label>
+          <label className="adm-field">
+            <span className="adm-label">Slug (URL id)</span>
+            <input type="text" name="slug" placeholder="japan_2027" required />
+          </label>
+          <label className="adm-field">
+            <span className="adm-label">Icon</span>
+            <input type="text" name="icon" placeholder="🗾" />
+          </label>
+        </div>
+        <div className="adm-actions">
+          <button className="adm-btn primary" type="submit">
+            Create itinerary
+          </button>
+        </div>
+      </form>
 
-      <div className="table-wrap">
-        <table className="ntable">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Name</th>
-              <th>Contents</th>
-              <th style={{ textAlign: 'right' }}>Visible</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(itineraries ?? []).map((it) => {
-              const variants = (it.variants ?? []) as { stays: unknown[]; days: unknown[] }[];
-              const stays = variants.reduce((n, v) => n + (v.stays?.length ?? 0), 0);
-              const days = variants.reduce((n, v) => n + (v.days?.length ?? 0), 0);
-              return (
-                <tr key={it.id}>
-                  <td style={{ fontSize: 18 }}>{it.icon}</td>
-                  <td>
-                    <div className="hname">{it.name}</div>
-                    <div className="hsub">{it.slug}</div>
-                  </td>
-                  <td className="hsub">
-                    {variants.length} variant{variants.length === 1 ? '' : 's'} · {stays} stays ·{' '}
-                    {days} days
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <PublishToggle id={it.id} published={it.published} name={it.name} />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="callout">
-        Hiding an itinerary removes it from the site within 5 minutes without deleting anything —
-        useful for a trip you have ruled out but want to keep.
+      <h2 className="adm-h2">Who can edit</h2>
+      <div className="adm-row">
+        <p className="adm-help">
+          {editors?.map((e) => e.email).join(', ') || 'Nobody yet.'}
+        </p>
+        <p className="adm-help">
+          Access is granted in Supabase only — Table Editor → <code>editors</code> → Insert row,
+          lowercase. A signed-in editor cannot grant access to anyone else.
+        </p>
       </div>
 
       <hr className="div" />
       <form action={signOutEditor}>
-        <button className="gt-btn" type="submit">
+        <button className="adm-btn" type="submit">
           Sign out of editing
         </button>
       </form>
-      <div className="side-foot" style={{ border: 'none', marginTop: 8 }}>
-        Signing out ends editing only. You stay signed in for reading.
-      </div>
+      <p className="adm-help">Ends editing only. You stay signed in for reading.</p>
     </div>
   );
 }

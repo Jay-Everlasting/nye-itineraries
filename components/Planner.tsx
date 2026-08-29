@@ -29,7 +29,16 @@ export default function Planner({
     } catch {
       /* private mode, or storage disabled — defaults are fine */
     }
-  }, []);
+
+    // ?open=<slug> jumps straight to one trip — used by "View" in the admin
+    // editor. Read here rather than via searchParams so the page stays static.
+    try {
+      const want = new URLSearchParams(window.location.search).get('open');
+      if (want && itineraries.some((i) => i.slug === want)) setActiveSlug(want);
+    } catch {
+      /* no-op */
+    }
+  }, [itineraries]);
 
   const setCurrency = useCallback((next: CurrencyCode) => {
     setCode(next);

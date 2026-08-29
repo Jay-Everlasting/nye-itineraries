@@ -15,7 +15,8 @@
     "set-password": "node scripts/set-password.mjs",
     "status": "node scripts/status.mjs",
     "fingerprint": "node scripts/fingerprint.mjs",
-    "auth-users": "node scripts/auth-users.mjs"
+    "auth-users": "node scripts/auth-users.mjs",
+    "inspect": "node scripts/inspect.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
