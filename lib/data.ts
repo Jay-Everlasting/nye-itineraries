@@ -1,21 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
+import { admin } from './supabase/admin';
 import type { Itinerary } from './types';
-
-/**
- * Read-only client for server rendering. Uses the publishable key, so RLS
- * applies exactly as it does for any visitor — nothing privileged here.
- */
-function readClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) {
-    throw new Error(
-      'Missing NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY. ' +
-        'Copy .env.example to .env.local (locally) or set them in Vercel project settings.'
-    );
-  }
-  return createClient(url, key, { auth: { persistSession: false } });
-}
 
 const SELECT = `
   *,
@@ -32,7 +16,7 @@ const SELECT = `
 const bySort = <T extends { sort_order: number }>(a: T, b: T) => a.sort_order - b.sort_order;
 
 export async function getItineraries(): Promise<Itinerary[]> {
-  const db = readClient();
+  const db = admin();
   const { data, error } = await db
     .from('itineraries')
     .select(SELECT)
@@ -58,7 +42,7 @@ export async function getItineraries(): Promise<Itinerary[]> {
 }
 
 export async function getAudRate(): Promise<number> {
-  const db = readClient();
+  const db = admin();
   const { data } = await db.from('settings').select('value').eq('key', 'aud_rate').maybeSingle();
   const v = Number(data?.value);
   return Number.isFinite(v) && v > 0 ? v : 1.63;

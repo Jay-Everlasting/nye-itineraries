@@ -1,20 +1,22 @@
 import { NextResponse } from 'next/server';
+import { admin } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * Daily Vercel Cron target. A trivial read keeps the Supabase free-tier project
- * from pausing after ~7 days of inactivity.
+ * from pausing after ~7 days of inactivity. Left outside the password gate in
+ * middleware so the cron can reach it unauthenticated.
  */
 export async function GET() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) {
-    return NextResponse.json({ ok: false, error: 'missing env' }, { status: 500 });
+  try {
+    const { error } = await admin().from('itineraries').select('slug').limit(1);
+    if (error) throw new Error(error.message);
+    return NextResponse.json({ ok: true, at: new Date().toISOString() });
+  } catch (e) {
+    return NextResponse.json(
+      { ok: false, error: e instanceof Error ? e.message : 'unknown' },
+      { status: 500 }
+    );
   }
-  const res = await fetch(`${url}/rest/v1/itineraries?select=slug&limit=1`, {
-    headers: { apikey: key, Authorization: `Bearer ${key}` },
-    cache: 'no-store',
-  });
-  return NextResponse.json({ ok: res.ok, status: res.status, at: new Date().toISOString() });
 }
