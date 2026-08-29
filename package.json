@@ -12,7 +12,9 @@
     "seed": "node scripts/extract-legacy.mjs && node scripts/verify-legacy.mjs && node scripts/seed.mjs",
     "seed:dry": "node scripts/seed.mjs --dry",
     "editors": "node scripts/editors.mjs",
-    "set-password": "node scripts/set-password.mjs"
+    "set-password": "node scripts/set-password.mjs",
+    "status": "node scripts/status.mjs",
+    "fingerprint": "node scripts/fingerprint.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
