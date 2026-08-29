@@ -83,7 +83,7 @@ export default async function SectionPage({
                   {options.map((o) => (
                     <OptionRow key={String(o.id)} option={o} stayId={String(stay.id)} slug={slug} />
                   ))}
-                  <OptionRow stayId={String(stay.id)} slug={slug} isNew />
+                  <OptionRow stayId={String(stay.id)} slug={slug} isNew city={String(stay.city)} />
 
                   <details className="adm-stay-settings">
                     <summary>Stay settings (city, dates, nights)</summary>
@@ -93,10 +93,15 @@ export default async function SectionPage({
               );
             })}
 
-            <details className="adm-section">
-              <summary>➕ Add a stay</summary>
+            <details className="adm-section adm-add-city">
+              <summary>🏙️ Add a new city or base</summary>
               <div className="adm-section-body">
-                <RowForm table="stays" parentId={String(v.id)} slug={slug} title="New stay" />
+                <p className="adm-help">
+                  Only for a <b>new place you sleep</b> — another city, or a cabin leg. To add
+                  another hotel or apartment to a city that is already listed, use the
+                  &ldquo;Add another place to stay&rdquo; row inside that city&rsquo;s card above.
+                </p>
+                <RowForm table="stays" parentId={String(v.id)} slug={slug} title="New city or base" />
               </div>
             </details>
           </div>

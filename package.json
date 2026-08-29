@@ -16,7 +16,9 @@
     "status": "node scripts/status.mjs",
     "fingerprint": "node scripts/fingerprint.mjs",
     "auth-users": "node scripts/auth-users.mjs",
-    "inspect": "node scripts/inspect.mjs"
+    "inspect": "node scripts/inspect.mjs",
+    "audit": "node scripts/audit.mjs",
+    "stays": "node scripts/stays.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

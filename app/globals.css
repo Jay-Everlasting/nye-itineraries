@@ -672,3 +672,10 @@
     .opt-row{border:1px solid var(--border); padding:10px; margin-bottom:8px;}
     .opt-more{margin-left:0;}
   }
+
+  /* Make the "add an option" row unmistakable — mistaking it for a no-op sends
+     people to "Add a stay", which creates a duplicate empty city. */
+  .opt-add-label{
+    font-size:12px; font-weight:650; color:#0b6e99; padding:2px 2px 7px;
+  }
+  .adm-add-city > summary{color:var(--text-muted);}

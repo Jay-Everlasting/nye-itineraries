@@ -18,16 +18,24 @@ export default function OptionRow({
   stayId,
   slug,
   isNew = false,
+  city,
 }: {
   option?: Row;
   stayId: string;
   slug: string;
   isNew?: boolean;
+  /** Shown on the add row so it is obvious which city it belongs to. */
+  city?: string;
 }) {
   const id = option?.id ? String(option.id) : '';
 
   return (
     <form action={saveRow} className={`opt-row${isNew ? ' opt-new' : ''}`}>
+      {isNew && (
+        <div className="opt-add-label">
+          ➕ Add another place to stay in {city ?? 'this city'}
+        </div>
+      )}
       <input type="hidden" name="_table" value="stay_options" />
       <input type="hidden" name="_id" value={id} />
       <input type="hidden" name="_slug" value={slug} />
