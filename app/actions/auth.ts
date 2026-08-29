@@ -88,9 +88,22 @@ export async function sendEditCode(_prev: unknown, formData: FormData) {
     return { error: 'That address cannot edit this site.' };
   }
 
+  // Supabase sends the "Confirm signup" template the first time it sees an
+  // address, and "Magic Link" every time after. To keep one template in play,
+  // create the user up front as already-confirmed via the Admin API; then
+  // signInWithOtp always takes the magic-link branch.
+  const { error: createErr } = await admin().auth.admin.createUser({
+    email,
+    email_confirm: true,
+  });
+  // "already been registered" just means we did this on a previous login.
+  if (createErr && !/already/i.test(createErr.message)) {
+    return { error: `Could not prepare the account: ${createErr.message}` };
+  }
+
   const { error } = await authClient().auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: true },
+    options: { shouldCreateUser: false },
   });
   if (error) {
     return { error: `Could not send the code: ${error.message}` };
@@ -114,8 +127,19 @@ export async function verifyEditCode(_prev: unknown, formData: FormData) {
     .maybeSingle();
   if (!editor) return { error: 'That address cannot edit this site.' };
 
-  const { error } = await authClient().auth.verifyOtp({ email, token, type: 'email' });
-  if (error) {
+  // The first code an address ever receives comes from the "Confirm signup"
+  // template and verifies as type 'signup'; later ones come from "Magic Link"
+  // and verify as 'email'. Try both rather than making the first login fail.
+  const client = authClient();
+  let verified = false;
+  for (const type of ['email', 'signup'] as const) {
+    const { error } = await client.auth.verifyOtp({ email, token, type });
+    if (!error) {
+      verified = true;
+      break;
+    }
+  }
+  if (!verified) {
     return { error: 'That code is wrong or has expired.', sent: true, email, next };
   }
 
