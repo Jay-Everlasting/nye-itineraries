@@ -68,16 +68,8 @@ if (DRY) {
   process.exit(0);
 }
 
-// ---------------------------------------------------------------- editors
-const emails = (process.env.EDITOR_EMAILS || '')
-  .split(',')
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean);
-if (emails.length) {
-  const { error } = await db.from('editors').upsert(emails.map((email) => ({ email })));
-  if (error) throw new Error(`editors: ${error.message}`);
-  console.log(`Editors allowlisted: ${emails.join(', ')}`);
-}
+// Editors are granted access in the Supabase dashboard only, so seeding does
+// not touch the `editors` table.
 
 // ---------------------------------------------------------------- settings
 if (seed.settings?.length) {

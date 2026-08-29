@@ -1,13 +1,13 @@
 /**
- * Manage who is allowed to edit (picks, pins, /admin).
+ * Inspect who is allowed to edit (/admin).
  *
- * The `editors` table is the source of truth — EDITOR_EMAILS in .env.local only
- * seeds it the first time. RLS grants no write access to this table at all, so
- * it can only be changed with the secret key (here) or the Supabase dashboard.
+ * Granting access is deliberately NOT possible from here — add editors in the
+ * Supabase dashboard (Table Editor -> editors -> Insert row) so there is a
+ * single place where access is granted. Use lowercase addresses: the login
+ * check compares exactly.
  *
  *   npm run editors                      list
- *   npm run editors -- add a@b.com       allow
- *   npm run editors -- remove a@b.com    revoke
+ *   npm run editors -- remove a@b.com    revoke (emergency lever)
  */
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,15 +45,11 @@ async function list() {
 if (!action) {
   await list();
 } else if (action === 'add') {
-  if (!email?.includes('@')) {
-    console.error('Usage: npm run editors -- add someone@example.com');
-    process.exit(1);
-  }
-  const { error } = await db.from('editors').upsert({ email });
-  if (error) throw new Error(error.message);
-  console.log(`Allowed: ${email}`);
-  console.log('They must sign in with this exact address for it to take effect.');
-  await list();
+  console.error(
+    'Adding editors from the command line is disabled on purpose.\n' +
+      'Add them in Supabase: Table Editor -> editors -> Insert row -> email (lowercase).'
+  );
+  process.exit(1);
 } else if (action === 'remove') {
   if (!email) {
     console.error('Usage: npm run editors -- remove someone@example.com');
@@ -67,6 +63,6 @@ if (!action) {
   console.log(count ? `Revoked: ${email}` : `Not found: ${email}`);
   await list();
 } else {
-  console.error(`Unknown action "${action}". Use: (nothing) | add <email> | remove <email>`);
+  console.error(`Unknown action "${action}". Use: (nothing) | remove <email>`);
   process.exit(1);
 }
