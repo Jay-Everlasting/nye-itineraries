@@ -20,7 +20,8 @@
     "audit": "node scripts/audit.mjs",
     "stays": "node scripts/stays.mjs",
     "dump": "node scripts/dump.mjs",
-    "add:ct-inn": "node scripts/add-austria-ct-inn.mjs"
+    "add:ct-inn": "node scripts/add-austria-ct-inn.mjs",
+    "reorder": "node scripts/reorder.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

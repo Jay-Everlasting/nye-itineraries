@@ -108,8 +108,9 @@ export default function Planner({
 
         {/* Sibling of .side-foot, not a child: the <=820px rules hide
             .side-foot entirely, which would take the link with it. */}
-        <a className="side-admin" href="/admin">
-          🛠️ Manage
+        <a className="side-admin" href="/admin" aria-label="Manage itineraries" title="Manage itineraries">
+          <span className="side-admin-icon" aria-hidden="true">⚙️</span>
+          <span className="side-admin-text">Manage</span>
         </a>
 
         <div className="side-foot">
