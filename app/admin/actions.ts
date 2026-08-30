@@ -8,6 +8,16 @@ import { EDIT_COOKIE, verifySession } from '@/lib/auth';
 import { SCHEMA, rowFromForm, type TableName } from '@/lib/schema';
 
 /**
+ * Row actions report their outcome instead of throwing, so the UI can tell
+ * "saved" from "failed" — a toast that says Saved after a failure is worse
+ * than no toast at all. `at` changes every call so repeated saves re-trigger.
+ */
+export type ActionResult = { ok: true; message: string; at: number } | { ok: false; error: string; at: number };
+
+const ok = (message: string): ActionResult => ({ ok: true, message, at: Date.now() });
+const fail = (error: string): ActionResult => ({ ok: false, error, at: Date.now() });
+
+/**
  * Every mutation re-checks the edit session server-side. Middleware gates the
  * page, but an action can be invoked directly, so it must not trust the caller.
  */
@@ -49,8 +59,12 @@ export async function setPublished(id: string, published: boolean) {
  * Insert or update one row of any editable table. The table and parent id come
  * from hidden inputs; both are validated against the schema before use.
  */
-export async function saveRow(formData: FormData) {
-  await requireEditor();
+export async function saveRow(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
+  try {
+    await requireEditor();
+  } catch (e) {
+    return fail(e instanceof Error ? e.message : 'Not allowed.');
+  }
 
   const table = assertTable(String(formData.get('_table')));
   const id = String(formData.get('_id') ?? '');
@@ -67,7 +81,7 @@ export async function saveRow(formData: FormData) {
   const db = admin();
   if (id) {
     const { error } = await db.from(table).update(row).eq('id', id);
-    if (error) throw new Error(error.message);
+    if (error) return fail(error.message);
   } else {
     // New rows append to the end unless an explicit order was typed, so adding
     // ten days in a row does not leave them all at 0 in arbitrary order.
@@ -82,22 +96,31 @@ export async function saveRow(formData: FormData) {
       row.sort_order = (last?.sort_order ?? -1) + 1;
     }
     const { error } = await db.from(table).insert(row);
-    if (error) throw new Error(error.message);
+    if (error) return fail(error.message);
   }
   refresh(slug);
+  return ok(id ? `${SCHEMA[table].label} saved` : `${SCHEMA[table].label} added`);
 }
 
-export async function deleteRow(formData: FormData) {
-  await requireEditor();
+export async function deleteRow(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  try {
+    await requireEditor();
+  } catch (e) {
+    return fail(e instanceof Error ? e.message : 'Not allowed.');
+  }
 
   const table = assertTable(String(formData.get('_table')));
   const id = String(formData.get('_id') ?? '');
   const slug = String(formData.get('_slug') ?? '') || null;
-  if (!id) throw new Error('Nothing to delete.');
+  if (!id) return fail('Nothing to delete.');
 
   const { error } = await admin().from(table).delete().eq('id', id);
-  if (error) throw new Error(error.message);
+  if (error) return fail(error.message);
   refresh(slug);
+  return ok(`${SCHEMA[table].label} deleted`);
 }
 
 /** Create a blank itinerary with one default variant, then open its editor. */

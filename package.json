@@ -18,7 +18,9 @@
     "auth-users": "node scripts/auth-users.mjs",
     "inspect": "node scripts/inspect.mjs",
     "audit": "node scripts/audit.mjs",
-    "stays": "node scripts/stays.mjs"
+    "stays": "node scripts/stays.mjs",
+    "dump": "node scripts/dump.mjs",
+    "add:ct-inn": "node scripts/add-austria-ct-inn.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
@@ -27,7 +29,8 @@
     "next": "^15.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "sonner": "^2.0.8"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.20",
